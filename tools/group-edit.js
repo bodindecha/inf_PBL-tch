@@ -314,7 +314,10 @@ const PBL = (function(d) {
                     adv3: $('main .page[path="create"] [name="adv3"]').val(),
                     type: $('main .page[path="create"] [name="type"]').val()
                 };
-                if (data.nameth.length && !/^[ก-๛0-9A-Za-z ()[\]{}\-!@#$%.,/&*+_?|]{3,150}$/.test(data.nameth)) {
+                if (!/\d{5}/.test(data.mbr1)) {
+                    app.ui.notify(1, [2, "Group leader required."]);
+                    $('main .page[path="create"] [name="mbr1"] + input').focus();
+                } else if (data.nameth.length && !/^[ก-๛0-9A-Za-z ()[\]{}\-!@#$%.,/&*+_?|]{3,150}$/.test(data.nameth)) {
                     app.ui.notify(1, [2, "Invalid Thai project name."]);
                     $('main .page[path="create"] [name="nameth"]').focus();
                 } else if (data.nameen.length && !/^[A-Za-z0-9ก-๛ ()[\]{}\-!@#$%.,/&*+_?|]{3,150}$/.test(data.nameen)) {

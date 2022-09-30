@@ -72,7 +72,7 @@
                         fst.start("เลือกครูที่ปรึกษาโครงงานคนที่ "+ai, 'input[name="adv'+ai+'"]', 'input[name="adv'+ai+'"] + input[readonly]', exc);
                     }, member: function(no) {
                         let ai = no.toString();
-                        fsa.start("เลือกครูสมาชิกกลุ่มที่ "+ai, 'input[name="mbr'+ai+'"]', 'input[name="mbr'+ai+'"] + input[readonly]', "", "PBL_no-group");
+                        fsa.start("เลือกสมาชิกคนที่ "+ai+" ของกลุ่ม", 'input[name="mbr'+ai+'"]', 'input[name="mbr'+ai+'"] + input[readonly]', "", "PBL_no-group");
                     }
                 }, show: {
                     code: function() {

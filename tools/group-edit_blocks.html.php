@@ -32,7 +32,7 @@
                         <td><input name="nameen" type="text" maxlength="150" pattern="[A-Za-z0-9ก-๛ ()[\]{}\-!@#$%.,/&*+_?|]{3,150}"></td>
                     </tr>
                     <tr>
-                        <td>หัวหน้ากลุ่ม</td>
+                        <td>หัวหน้ากลุ่ม<font style="color: var(--clr-bs-red);">*</font></td>
                         <td><input name="mbr1" type="hidden"><input type="text" readonly onFocus="pUI.select.member(1)"></td>
                     </tr>
                     <tr>
