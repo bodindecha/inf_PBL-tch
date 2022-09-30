@@ -15,9 +15,9 @@ const ajax = async function(url, params=null, method="POST", resultType="json") 
     else dat.reason.forEach(em => app.ui.notify(1, em));
     return false;
 };
-const PBL = (function(d) {
+/* const PBL = (function(d) {
     const cv = {
-        API_URL: "/s/PBL/v2/api/"
+        API_URL: "/t/PBL/v2/api/main-"
     };
     var sv = {
         started: false
@@ -33,4 +33,4 @@ const PBL = (function(d) {
         init: initialize
         
     };
-}(document)); top.PBL = PBL;
+}(document)); top.PBL = PBL; */

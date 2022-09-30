@@ -1,9 +1,10 @@
 <?php
     $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
-	$header_title = "กลุ่ม PBL";
+	$header_title = "รายชื่อกลุ่ม PBL";
 	$header_desc = "รายการโครงงาน PBL";
 	$home_menu = "is-pbl";
+    $forceExternalBrowser = true;
 
 	require_once($dirPWroot."resource/php/core/config.php");
 ?>
@@ -90,7 +91,7 @@
 		<script type="text/javascript">
 			$(document).ready(function() {
 				// PBL.init();
-				pBL.init();
+				PBL.init();
 			});
 			top.USER = "<?=$_SESSION['auth']['user']?>";
 			top.USER_ADMIN = !parseInt("<?=(has_perm("PBL") ? 0 : 1)?>");
@@ -103,14 +104,14 @@
 					toggle: function() {
 						(function() {
 							$("main .fform").toggle("blind");
-							pBL.changeState("useFilter",
+							PBL.changeState("useFilter",
 								!$('main .mform button[onClick*="filter.toggle"]').toggleClass("hollow").is(".hollow")
 							);
 						}()); return false;
 					}, show: function() {
 						$("main .fform").show();
 						$('main .mform button[onClick*="filter.toggle"]').removeClass("hollow")
-						pBL.changeState("useFilter", true);
+						PBL.changeState("useFilter", true);
 					}, reset: function(close) {
 						(function() {
 							document.querySelector("main .fform").reset();
@@ -122,20 +123,20 @@
 						var finder = $("main .oform [name=find]").val().trim().replaceAll("เเ", "แ");
 						w3.filterHTML("main .browser .results", "li", finder);
 					}, enableSearch: function() {
-						$('main .mform button[onClick*="pBL.load"]').removeAttr("disabled");
+						$('main .mform button[onClick*="PBL.load"]').removeAttr("disabled");
 					}
 				}, viewFile: function(code) { // function(file, code) {
 					// var link = "/t/PBL/v2/preview?file="+file+"&code="+code;
 					var file = $('main .results .action [name="'+code+':file"]').val(),
 						link = "/t/PBL/v2/preview?file="+file+"&code="+code;
 					if (ppa.ctrling()) window.open(link);
-					else app.ui.lightbox.open("mid", {title: code+": "+pBL.cv.workFile[Object.keys(pBL.cv.fileList).indexOf(file)], allowclose: true,
+					else app.ui.lightbox.open("mid", {title: code+": "+PBL.cv.workFile[Object.keys(PBL.cv.fileList).indexOf(file)], allowclose: true,
 						html: '<iframe src="'+link+'" style="width:90vw;height:80vh;border:none">Loading...</iframe>'});
 				}
 			};
 		</script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/PBL-teacher.min.js"></script>
-		<script type="text/javascript" src="/t/PBL/v2/tools/PBL-teacher-list.min.js"></script>
+		<script type="text/javascript" src="/t/PBL/v2/tools/group-list.min.js"></script>
 		<script type="text/javascript" src="/resource/js/lib/w3.min.js"></script>
 		<script type="text/javascript" src="/resource/js/lib/jquery-bez.min.js"></script>
 	</head>
@@ -153,7 +154,7 @@
 						<span>ห้อง</span>
 						<select name="room"></select>
 					</div>
-					<button class="blue" onClick="return pBL.load()">ค้นหา</button>
+					<button class="blue" onClick="return PBL.load()">ค้นหา</button>
 					<button class="gray hollow" onClick="return pUI.filter.toggle()" data-title="Filter">
 						<i class="material-icons">filter_list</i>
 					</button>

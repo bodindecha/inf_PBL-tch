@@ -1,4 +1,4 @@
-const pBL = (function(d) {
+const PBL = (function(d) {
     const cv = {
         API_URL: "/t/PBL/v2/api/", USER: top.USER,
         isModerator: top.USER_ADMIN,
@@ -176,7 +176,7 @@ const pBL = (function(d) {
         (async function(loadNext) {
             if (!loadNext) {
                 getOpts();
-                $('main .mform button[onClick*="pBL.load"]').attr("disabled", "");
+                $('main .mform button[onClick*="PBL.load"]').attr("disabled", "");
             } else $("main .browser div:last-child > button").attr("disabled", "");
             await ajax(cv.API_URL+"list", {type: null, act: null, param: {...sv.opts, loadNext: loadNext}}).then(function(dat) {
                 if (!loadNext) {
@@ -201,7 +201,7 @@ const pBL = (function(d) {
         if (projList.length) {
             projList.forEach(proj => {
                 result.append(projBlock(proj));
-            }); if (nextLoad != null) next.replaceWith('<button class="blue hollow small" onClick="pBL.load('+nextLoad.toString()+')">Load more</button>');
+            }); if (nextLoad != null) next.replaceWith('<button class="blue hollow small" onClick="PBL.load('+nextLoad.toString()+')">Load more</button>');
             else next.fadeOut(function() {
                 $(this).replaceWith('<span>——— End of results ———</span>').show();
             }); if (!clearList) pUI.filter.update();
@@ -211,7 +211,7 @@ const pBL = (function(d) {
             $(this).replaceWith('<span>——— End of results ———</span>').show();
         });
     },
-    projBlock = pi => '<li><div class="accordian" onClick="pBL.expand(this)">'+
+    projBlock = pi => '<li><div class="accordian" onClick="PBL.expand(this)">'+
         '<span class="title txtoe">'+pi.title+'</span>'+
         '</div><div class="extender" data-code="'+pi.code+'" data-loaded="false" style="height: 0;">'+
             '<div class="details">'+
