@@ -5,6 +5,8 @@
 	$header_desc = "แก้ไข้ข้อมูลโครงงาน";
 	$home_menu = "is-pbl";
     $forceExternalBrowser = true;
+
+    $isAllowed = has_perm("PBL");
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -51,6 +53,7 @@
                 main .notifyjs-PBL-unsaved-base button { font-size: small; }
             }
 		</style>
+        <?php if ($isAllowed) { ?>
         <link rel="stylesheet" href="/t/PBL/v2/tools/group-edit.min.css" />
 		<link rel="stylesheet" href="/resource/css/extend/all-PBL.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
@@ -112,10 +115,12 @@
 		<script type="text/javascript" src="/resource/js/extend/fs-account.js"></script>
 		<script type="text/javascript" src="/resource/js/lib/print.min.js"></script>
 		<script type="text/javascript" src="/resource/js/lib/notify.min.js"></script>
+        <?php } ?>
 	</head>
 	<body>
 		<?php require($dirPWroot."resource/hpe/header.php"); ?>
 		<main shrink="<?php echo($_COOKIE['sui_open-nt'])??"false"; ?>">
+            <?php if (!$isAllowed) echo '<iframe src="/error/901">Loading...</iframe>'; else { ?>
 			<div class="container">
 				<h2 class="title-btn"><?=$header_desc?> <a href="javascript:PBL.help();" class="icon"><i class="fa fa-question-circle"></i></a></h2>
 				<!--form class="form inline">
@@ -161,7 +166,7 @@
                         <span>วิดีโอแนะนำการใช้งาน</span>
                     </a>
                 </div>
-            </div>
+            </div><?php } ?>
 		</main>
 		<?php require($dirPWroot."resource/hpe/material.php"); ?>
 		<footer>

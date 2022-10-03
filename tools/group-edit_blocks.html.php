@@ -18,6 +18,14 @@
 </block-obj-->
 <!--  -->
 <section class="pages" page-type="ng">
+    <div class="page" path="open">
+        <form class="form wrapper message rainbow-bg">
+            <div class="group spread"><div class="group">
+                <input name="gjc" type="text" maxlength="6" size="6" pattern="[A-Za-z0-9]{6}" placeholder="Enter group code here" required>
+                <button onClick="return PBL.openGroup()" class="cyan">Load</button>
+            </div></div>
+        </form>
+    </div>
     <div class="page" path="create">
         <div class="message gray wrapper">
             <form class="form">
@@ -60,14 +68,6 @@
                 </div>
             </form>
         </div>
-    </div>
-    <div class="page" path="open">
-        <form class="form wrapper message rainbow-bg">
-            <div class="group spread"><div class="group">
-                <input name="gjc" type="text" maxlength="6" size="6" pattern="[A-Za-z0-9]{6}" placeholder="Enter group code here" required>
-                <button onClick="return PBL.openGroup()" class="cyan">Load</button>
-            </div></div>
-        </form>
     </div>
 </section>
 <section class="pages" page-type="hg">

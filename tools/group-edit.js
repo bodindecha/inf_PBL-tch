@@ -18,8 +18,8 @@ const PBL = (function(d) {
         },
         tab_menu: {
             ng: [
-                ["create", "Create", "library_add"],
-                ["open", "Open", "exit_to_app"]
+                ["open", "Open", "exit_to_app"],
+                ["create", "Create", "library_add"]
             ],
             hg: [
                 ["information", "Information", "library_books"],
@@ -229,12 +229,11 @@ const PBL = (function(d) {
         // Add pages
         $("main > .container .pages").load("/t/PBL/v2/tools/group-edit_blocks.html .pages[page-type="+dType+"g]", function() {
             $("main > .container > .pages").html($("main > .container .pages > .pages").html());
-            PBL.openPage(loadPart[0], loadPart);
             if (dType == "h") {
                 renderBlock("member", "settingsOption");
                 renderBlock("submissions", "readyTable");
-                chatApp.start("tch", [sv.code]); sv.chatInit = false;
-            }
+                chatApp.init(true); sv.chatInit = false;
+            } PBL.openPage(loadPart[0], loadPart);
         });
     }, load_page = function(me, args=[]) {
         if (typeof me === "string") me = d.querySelector('main .tab-selector .tab[data-page="'+me+'"]');
@@ -291,9 +290,13 @@ const PBL = (function(d) {
                 } else load_work_status();
             } break;
             case "comments": {
-                if (!sv.chatInit) {
-                    sv.chatInit = true;
-                    chatApp.init(true);
+                if (sv.chatInit == false) {
+                    sv.chatInit = true, starter = setInterval(() => {
+                        if (chatApp.status()) {
+                            chatApp.start("tch", [sv.code]);
+                            clearInterval(starter);
+                        }
+                    }, 250);
                 }
             } break;
         }
@@ -344,7 +347,7 @@ const PBL = (function(d) {
                 $('main .page[path="open"] [name="gjc"]').focus();
             } else {
                 btnAction.freeze();
-                history.replaceState(null, null, "/t/PBL/v2/group/"+code+"/edit");
+                history.pushState(null, null, "/t/PBL/v2/group/"+code+"/edit");
                 getStatus();
             }
         }()); return false;
@@ -474,7 +477,7 @@ const PBL = (function(d) {
             if (confirm(cv.MSG["delete-group"])) await ajax(cv.API_URL+"group-action", {type: "delete", act: "void", param: {code: sv.code}}).then(function(dat) {
                 if (typeof dat.message !== "undefined") dat.message.forEach(em => app.ui.notify(1, em));
                 if (dat) {
-                    history.replaceState(null, null, "/t/PBL/v2/group/home");
+                    history.pushState(null, null, "/t/PBL/v2/group/home");
                     initialRender([null, null, 1]);
                 }
             });
