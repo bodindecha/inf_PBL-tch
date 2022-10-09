@@ -14,7 +14,13 @@ const PBL = (function(d) {
                 '<button class="gray" onClick="PBL.file.preview(\''+type+'\')" data-title="View file"><i class="material-icons">visibility</i></button>'+
                 '<button class="yellow" onClick="PBL.file.print(\''+type+'\')" data-title="Print file"><i class="material-icons">print</i></button>'+
                 '<button class="green" onClick="PBL.file.download(\''+type+'\')" data-title="Download file"><i class="material-icons">download</i></button>'+
-                '<button class="red" onClick="PBL.file.remove(\''+type+'\')" data-title="Remove file"><i class="material-icons">delete</i></button>'
+                '<button class="red" onClick="PBL.file.remove(\''+type+'\')" data-title="Remove file"><i class="material-icons">delete</i></button>',
+            "memberAction": ID => '<div class="group">'+
+                '<button onClick="PBL.kick('+ID+')" class="red hollow">ลบชื่อออก</button>'+
+                '<button onClick="PBL.setLeader('+ID+')" class="yellow hollow icon" data-title="Set as leader">👑</button>'+
+                '</div>',
+            "uploadButton": work => '<button class="blue hollow" onClick="PBL.upload(\''+work+'\')"><i class="material-icons">add_circle</i>Upload attatchment</button>',
+            "newMember": index => '<tr class="add"><td>'+index.toString()+'.</td><td colspan="2"><button class="black hollow" onClick="PBL.addMember(true)"><i class="material-icons">person_add</i> เพิ่มสมาชิก</button></td><td><input type="hidden" name="temp_mbr" /><input type="hidden" readonly /></td></tr>'
         },
         tab_menu: {
             ng: [
@@ -170,7 +176,7 @@ const PBL = (function(d) {
                 '</div>'+
             '</div>'});
             $(document).on('click', 'main .notifyjs-PBL-unsaved-base [name="keep"]', function() { $(this).trigger('notify-hide'); });
-            $(document).on('click', 'main .notifyjs-PBL-unsaved-base [name="load"]', function() {
+            $(document).on('click', 'main .page[path="information"] .notifyjs-PBL-unsaved-base [name="load"]', function() {
                 load_groupInfo();
                 $(this).trigger('notify-hide');
             });
@@ -230,6 +236,7 @@ const PBL = (function(d) {
         $("main > .container .pages").load("/t/PBL/v2/tools/group-edit_blocks.html .pages[page-type="+dType+"g]", function() {
             $("main > .container > .pages").html($("main > .container .pages > .pages").html());
             if (dType == "h") {
+                renderBlock("member", "initClass");
                 renderBlock("member", "settingsOption");
                 renderBlock("submissions", "readyTable");
                 chatApp.init(true); sv.chatInit = false;
@@ -271,7 +278,10 @@ const PBL = (function(d) {
                 }); sv.state["button_freeze"] = true;
             } break;
             case "member": {
-                if (params[0] == "settingsOption") {
+                if (params[0] == "initClass") {
+                    $('main .page[path="member"] output[name="class"]')
+                        .val("ม."+sv.status.grade.toString()+"/"+sv.status.room.toString());
+                } else if (params[0] == "settingsOption") {
                     var field = [$('main .page[path] .settings [name="maxMember"]')];
                     for (let amt = 1; amt <= 7; amt++) field[0].append('<option value="'+amt+'">'+amt+'</option>');
                 } else {
@@ -368,7 +378,7 @@ const PBL = (function(d) {
                         .attr("class", dat[ew] ? "y" : "n")
                         .val(dat[ew] ? "ส่งแล้ว" : "ไม่มีไฟล์");
                     var action = (dat[ew] ? cv.HTML["work-act"](ew)
-                        : '<button class="blue hollow" onClick="PBL.upload(\''+ew+'\')"><i class="material-icons">add_circle</i>Upload attatchment</button>');
+                        : cv.HTML["uploadButton"](ew));
                     $('main .page[path="submissions"] .work [data-work="'+ew+'"]')
                         .html(action)
                         .attr("class", "group center"+(dat[ew] ? " action" : ""));
@@ -444,12 +454,11 @@ const PBL = (function(d) {
                     dat2.list.forEach(es => {
                         listBody += '<tr><td>'+index.toString()+'.</td><td>'+es.fullname+' (<a href="/'+es.ID+'" target="_blank" draggable="false">'+es.nickname+'</a>)</td><td>เลขที่ '+es.number+'</td><td>';
                         if (index++ == 1) listBody += '<a role="button" class="default" disabled>หัวหน้ากลุ่ม</a>';
-                        else listBody += '<div class="group">'+
-                            '<button onClick="PBL.kick('+es.ID+')" class="red hollow">ลบชื่อออก</button>'+
-                            '<button onClick="PBL.setLeader('+es.ID+')" class="yellow hollow icon" data-title="Set as leader">👑</button>'+
-                            '</div>';
+                        else listBody += cv.HTML["memberAction"](es.ID);
                         listBody += '</td></tr>';
-                    }); $('main .page[path="member"] .list tbody').html(listBody);
+                    }); // Check empty
+                    if (dat.list.length < parseInt(dat.settings["maxMember"])) listBody += cv.HTML["newMember"](index);
+                    $('main .page[path="member"] .list tbody').html(listBody);
                 }); // Settings
                 sv.groupSettings = dat.settings;
                 if (andSettings) { // Lookup each
@@ -515,6 +524,9 @@ const PBL = (function(d) {
                 if (dat) {
                     sv.groupSettings[settingName] = newValue;
                     button.attr("disabled", "");
+                    switch (settingName) {
+                        case cv.mbr_settings[2]: load_member(false); break;
+                    }
                 }
             });
         }
@@ -577,6 +589,24 @@ const PBL = (function(d) {
         let pagePos = sv.history["unsavedPage"].indexOf(page);
         if (pagePos > -1) sv.history["unsavedPage"].splice(pagePos, 1);
         if (!sv.history["unsavedPage"].length) app.io.confirm("unleave");
+    }, addMember = async function(selectNew=false) {
+        if (selectNew) pUI.select.member(sv.status.grade, sv.status.room);
+        else {
+            var studentID = d.querySelector('input[name="temp_mbr"]').value;
+            $('input[name="temp_mbr"], input[name="temp_mbr"] + input[readonly]').val("");
+            if (studentID.length) {
+                if (!/^[1-9]\d{4}$/.test(studentID)) {
+                    app.ui.notify(1, [2, "Invalid student selected."]);
+                    return;
+                } // Process
+                await ajax(cv.API_URL+"group-main", {type: "member", act: "invite", param: {code: sv.code, mbr: studentID}}).then(function(dat) {
+                    if (dat) {
+                        load_member(false);
+                        app.ui.notify(1, [0, "New member ("+studentID+") added."]);
+                    }
+                });
+            } // else // isDiscard
+        }
     };
     return {
         init: initialize,
@@ -597,7 +627,8 @@ const PBL = (function(d) {
             print: print_file,
             download: download_file,
             remove: remove_file
-        }, // Export Internal
+        }, addMember: addMember,
+        // Export Internal
         btnAction: btnAction,
         groupCode: () => sv.code,
         pageURL: () => sv.current["page"],

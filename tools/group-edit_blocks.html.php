@@ -41,7 +41,7 @@
                     </tr>
                     <tr>
                         <td>หัวหน้ากลุ่ม<font style="color: var(--clr-bs-red);">*</font></td>
-                        <td><input name="mbr1" type="hidden"><input type="text" readonly onFocus="pUI.select.member(1)"></td>
+                        <td><input name="mbr1" type="hidden"><input type="text" readonly onFocus="pUI.select.leader(1)"></td>
                     </tr>
                     <tr>
                         <td>ครูที่ปรึกษา 1</td>
@@ -124,7 +124,7 @@
                 <button onClick="pUI.show.QRcode()" class="cyan icon" data-title="แสดงคิดอาร์โค้ด"><i class="material-icons">qr_code</i></button>
             </div></div></div>
         </div>
-        <p class="title-btn">สมาชิกกลุ่ม <button class="yellow" onClick="PBL.terminate(true)">ลบกลุ่ม</button></p>
+        <p class="title-btn"><span>สมาชิกกลุ่ม <output name="class"></output></span><button class="yellow" onClick="PBL.terminate(true)">ลบกลุ่ม</button></p>
         <table class="list form slider">
             <tbody></tbody>
         </table>

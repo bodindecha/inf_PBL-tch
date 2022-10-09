@@ -73,9 +73,11 @@
                         if (exclude[1] != "") exc += (exc == "" ? "" : ",") + exclude[1];
                         if (exclude[2] != "") exc += (exc == "" ? "" : ",") + exclude[2];
                         fst.start("เลือกครูที่ปรึกษาโครงงานคนที่ "+ai, 'input[name="adv'+ai+'"]', 'input[name="adv'+ai+'"] + input[readonly]', exc);
-                    }, member: function(no) {
+                    }, leader: function(no) {
                         let ai = no.toString();
                         fsa.start("เลือกสมาชิกคนที่ "+ai+" ของกลุ่ม", 'input[name="mbr'+ai+'"]', 'input[name="mbr'+ai+'"] + input[readonly]', "", "PBL_no-group");
+                    }, member: function(grade, room) {
+                        fsa.start("เพิ่มสมาชิกเข้ากลุ่ม", 'input[name="temp_mbr"]', 'input[name="temp_mbr"] + input[readonly]', {grade: grade, room: room}, "PBL_no-group");
                     }
                 }, show: {
                     code: function() {
@@ -105,8 +107,8 @@
                         case "link": app.io.copy.content("https://"+location.hostname+"/s/PBL/v2/#/group/join/"+PBL.groupCode()); break;
                     }
                 }
-            };
-            const validate_field = pUI.form.btnState;
+            }, validate_field = pUI.form.btnState,
+            sS = {complete: () => PBL.addMember()};
 		</script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/PBL-teacher.min.js"></script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/group-edit.min.js"></script>

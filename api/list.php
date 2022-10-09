@@ -32,7 +32,7 @@
 							} else $query .= " AND (mbr".implode(" ".$attr["search_key"]." OR mbr", str_split("1234567"))." ".$attr["search_key"].")";
 						} if (isset($attr["wf_file"]) && isset($attr["wf_count"]) && isset($attr["wf_status"])) {
 							if ($attr["wf_count"] == "all")
-								$query .= " AND fileStatus&".$attr["wf_file"]."=".($attr["wf_status"]=="sent"?$attr["wf_status"]:"0");
+								$query .= " AND fileStatus&".$attr["wf_file"]."=".($attr["wf_status"]=="sent"?$attr["wf_file"]:"0");
 							else $query .= " AND ".($attr["wf_status"]=="sent"?"":"!")."fileStatus&".$attr["wf_file"];
 						} if (isset($attr["mbr_comp"]) && isset($attr["mbr_amt"]))
 							$query .= " AND (IF(mbr".implode(" IS NULL, 0, 1) + IF(mbr", str_split("1234567"))." IS NULL, 0, 1))".$attr["mbr_comp"].$attr["mbr_amt"];

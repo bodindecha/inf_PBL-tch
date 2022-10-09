@@ -8,16 +8,17 @@
         case "get": {
 			switch ($command) {
 				case "personal": {
-					$get = $db -> query("SELECT code,grade FROM PBL_group WHERE code='$attr' AND mbr1 IS NOT NULL");
+					$get = $db -> query("SELECT code,grade,room FROM PBL_group WHERE code='$attr' AND mbr1 IS NOT NULL");
 					if (!$get) errorMessage(3, "Error loading your data.");
 					else {
 						$data = array("isGrouped" => boolval($get -> num_rows));
 						if ($data["isGrouped"]) {
 							$read = $get -> fetch_array(MYSQLI_ASSOC);
-							$read["grade"] = intval($read["grade"]);
+							$data["grade"] = intval($read["grade"]);
+							$data["room"] = intval($read["room"]);
 
 							$data["code"] = $read["code"];
-							$data["requireIS"] = ($read["grade"] == 2 || $read["grade"] == 4);
+							$data["requireIS"] = ($data["grade"] == 2 || $data["grade"] == 4);
 						} successState($data);
 					}
 				} break;

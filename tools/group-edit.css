@@ -138,7 +138,9 @@ main .page[path="member"] .list button {
     opacity: 0; filter: opacity(0);
     transition: calc(var(--time-tst-xfast) * 2 / 3);
 }
+main .page[path="member"] .list tr.add button { opacity: 0.75; filter: opacity(0.75); }
 main .page[path="member"] .list tr:hover button, main .page[path="member"] .list tr:focus-within button { opacity: 1; filter: opacity(1); }
+main .page[path="member"] .list tr.add td:nth-child(1) { color: var(--clr-gg-grey-500); }
 main .page[path="member"] .settings { gap: 5px; }
 main .page[path="member"] .settings > strong { margin-bottom: 7.5px; }
 main .page[path="member"] .settings > .group { align-items: center; }
