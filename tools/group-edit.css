@@ -85,6 +85,7 @@ main .page[path="open"] form {
     margin: 0 auto;
     width: fit-content;
 }
+main .page[path="open"] .group.spread { gap: 10px; }
 main .page[path="open"] [name="gjc"] {
     width: 212.5px;
     font-family: "Open sans", serif; text-transform: uppercase;

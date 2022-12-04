@@ -20,10 +20,10 @@
 <section class="pages" page-type="ng">
     <div class="page" path="open">
         <form class="form wrapper message rainbow-bg">
-            <div class="group spread"><div class="group">
+            <div class="group spread">
                 <input name="gjc" type="text" maxlength="6" size="6" pattern="[A-Za-z0-9]{6}" placeholder="Enter group code here" required>
                 <button onClick="return PBL.openGroup()" class="cyan">Load</button>
-            </div></div>
+            </div>
         </form>
     </div>
     <div class="page" path="create">
@@ -40,7 +40,7 @@
                         <td><input name="nameen" type="text" maxlength="150" pattern="[A-Za-z0-9ก-๛ ()[\]{}\-!@#$%.,/&*+_?|]{3,150}"></td>
                     </tr>
                     <tr>
-                        <td>หัวหน้ากลุ่ม<font style="color: var(--clr-bs-red);">*</font></td>
+                        <td>หัวหน้ากลุ่ม<font style="color: var(--clr-bs-red);" data-title="จำเป็น">*</font></td>
                         <td><input name="mbr1" type="hidden"><input type="text" readonly onFocus="pUI.select.leader(1)"></td>
                     </tr>
                     <tr>

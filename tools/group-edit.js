@@ -10,17 +10,17 @@ const PBL = (function(d) {
                     output += '<div class="work"><i class="material-icons" work="'+work+'"></i><label>'+pd.works[work]+'</label></div>'
                 }); output += '</div></div>';
                 return output;
-            }, "work-act": type => '<button class="blue" onClick="PBL.upload(\''+type+'\')" data-title="Replace with new file"><i class="fa fa-upload"></i></button>'+
-                '<button class="gray" onClick="PBL.file.preview(\''+type+'\')" data-title="View file"><i class="material-icons">visibility</i></button>'+
-                '<button class="yellow" onClick="PBL.file.print(\''+type+'\')" data-title="Print file"><i class="material-icons">print</i></button>'+
-                '<button class="green" onClick="PBL.file.download(\''+type+'\')" data-title="Download file"><i class="material-icons">download</i></button>'+
-                '<button class="red" onClick="PBL.file.remove(\''+type+'\')" data-title="Remove file"><i class="material-icons">delete</i></button>',
+            }, "work-act": type => '<button class="blue icon" onClick="PBL.upload(\''+type+'\')" data-title="Replace with new file"><i class="fa fa-upload"></i></button>'+
+                '<button class="gray icon" onClick="PBL.file.preview(\''+type+'\')" data-title="View file"><i class="material-icons">visibility</i></button>'+
+                '<button class="yellow icon" onClick="PBL.file.print(\''+type+'\')" data-title="Print file"><i class="material-icons">print</i></button>'+
+                '<button class="green icon" onClick="PBL.file.download(\''+type+'\')" data-title="Download file"><i class="material-icons">download</i></button>'+
+                '<button class="red icon" onClick="PBL.file.remove(\''+type+'\')" data-title="Remove file"><i class="material-icons">delete</i></button>',
             "memberAction": ID => '<div class="group">'+
                 '<button onClick="PBL.kick('+ID+')" class="red hollow">ลบชื่อออก</button>'+
                 '<button onClick="PBL.setLeader('+ID+')" class="yellow hollow icon" data-title="Set as leader">👑</button>'+
                 '</div>',
-            "uploadButton": work => '<button class="blue hollow" onClick="PBL.upload(\''+work+'\')"><i class="material-icons">add_circle</i>Upload attatchment</button>',
-            "newMember": index => '<tr class="add"><td>'+index.toString()+'.</td><td colspan="2"><button class="black hollow" onClick="PBL.addMember(true)"><i class="material-icons">person_add</i> เพิ่มสมาชิก</button></td><td><input type="hidden" name="temp_mbr" /><input type="hidden" readonly /></td></tr>'
+            "uploadButton": work => '<button class="blue hollow icon" onClick="PBL.upload(\''+work+'\')"><i class="material-icons">add_circle</i>Upload attatchment</button>',
+            "newMember": index => '<tr class="add"><td>'+index.toString()+'.</td><td colspan="2"><button class="black hollow icon" onClick="PBL.addMember(true)"><i class="material-icons">person_add</i> เพิ่มสมาชิก</button></td><td><input type="hidden" name="temp_mbr" /><input type="hidden" readonly /></td></tr>'
         },
         tab_menu: {
             ng: [
