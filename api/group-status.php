@@ -57,7 +57,7 @@
 								"download" => "/resource/file/download?furl=".urlencode($path)."&name=$code%20-%20$fileCfg[$file]",
 								"print" => base64_encode("/resource/$path")
 							)); else errorMessage(3, "File not found");
-						} else errorMessage(3, "File not found");
+						} else errorMessage(3, "File has not been submitted");
 					}
 				} break;
 				default: errorMessage(1, "Invalid command"); break;

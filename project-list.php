@@ -61,14 +61,21 @@
 			main .results .details {
 				padding: 10px;
 				border: var(--li-bdr) var(--clr-pp-grey-300); border-left: none; border-right: none; /* border-width: 0; */
+				font-size: 0.85em;
 			}
 			main .results .details > * { margin: 0 0 10px; }
 			main .results .details > *:last-child { margin: 0; }
-			main .results .details .namelist a[role="button"] { font-size: 12.5px; }
 			main .results .details .namelist {
 				margin: -5px 0 15px; padding-left: 15px;
 				white-space: nowrap;
 			}
+			main .results .details .namelist a[role="button"] {
+				padding: 2.5px 7.5px;
+				/* position: absolute; transform: translateY(-50%); */
+				font-size: 12.5px; line-height: 20px;
+				/* display: none; */
+			}
+			/* main .results li[open] .details .namelist a[role="button"] { display: inline-flex; } */
 			main .results .details .namelist td:nth-child(n+3) { padding-left: 12.5px; }
 			main .results .details [name$=":advisor"] {
 				padding-right: 30px;
@@ -154,10 +161,11 @@
 						<span>ห้อง</span>
 						<select name="room"></select>
 					</div>
-					<button class="blue" onClick="return PBL.load()">ค้นหา</button>
 					<button class="gray hollow" onClick="return pUI.filter.toggle()" data-title="Filter">
 						<i class="material-icons">filter_list</i>
 					</button>
+					<button class="blue" onClick="return PBL.load()">ค้นหา</button>
+					<?php if (has_perm("PBL")) echo '<button disabled class="green" onClick="PBL.()">ดาวน์โหลดรายชื่อ</button>'; ?>
 				</form>
 				<form class="form fform inline --message default" onSubmit="return false" style="display: none;">
 					<div class="group">

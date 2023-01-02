@@ -7,7 +7,8 @@
     switch ($type) {
         case "group": {
 			$code = escapeSQL($command);
-			$get = $db -> query("SELECT grade,room,lastupdate,type,mbr1,mbr2,mbr3,mbr4,mbr5,mbr6,mbr7,adv1,adv2,adv3,score FROM PBL_group WHERE code='$code'");
+			// No COALESCE on score -> only show when all is graded
+			$get = $db -> query("SELECT grade,room,lastupdate,type,mbr1,mbr2,mbr3,mbr4,mbr5,mbr6,mbr7,adv1,adv2,adv3,score_paper+score_poster+score_present AS score FROM PBL_group WHERE code='$code'");
 			if (!$get) {
 				errorMessage(3, "Error loading group's information. Please try again.");
 				slog("PBL", "load", "manifest", $code, "fail", "", "InvalidQuery");

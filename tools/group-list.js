@@ -55,13 +55,17 @@ const PBL = (function(d) {
             });
         }
     };
-    var seek_param = function() { if (location.hash.length > 1) {
+    var seek_param = async function() { if (location.hash.length > 1) {
         // Extract hashes
         var hash = {}; location.hash.substring(1, location.hash.length).split("&").forEach((ehs) => {
             let ths = ehs.split("=");
             hash[ths[0]] = ths[1];
         });
         if (typeof hash.filter !== "undefined") fillForm(objDecrypt(hash.filter));
+        if (typeof hash.autoload !== "undefined") {
+            PBL.load();
+            app.io.URL.removeHash("autoload=");
+        }
     } },
     fillForm = function(info) {
         var data = {}, filter = ["type", "isAdvisor", "search_type", "search_diff", "search_key", "sort", "order"];
@@ -178,7 +182,7 @@ const PBL = (function(d) {
                 getOpts();
                 $('main .mform button[onClick*="PBL.load"]').attr("disabled", "");
             } else $("main .browser div:last-child > button").attr("disabled", "");
-            await ajax(cv.API_URL+"list", {type: null, act: null, param: {...sv.opts, loadNext: loadNext}}).then(function(dat) {
+            await ajax(cv.API_URL+"list", {type: "group", act: null, param: {...sv.opts, loadNext: loadNext}}).then(function(dat) {
                 if (!loadNext) {
                     let old = location.pathname+location.search+location.hash;
                     history.replaceState(null, null, location.pathname+location.search+(Object.keys(sv.opts).length ? "#filter="+objEncrypt(sv.opts) : ""));

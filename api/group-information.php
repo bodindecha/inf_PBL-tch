@@ -9,7 +9,7 @@
 			switch ($command) {
 				case "title": {
 					$code = escapeSQL($attr["code"]);
-					$get = $db -> query("SELECT nameth,nameen,type,adv1,adv2,adv3,score FROM PBL_group WHERE code='$code'");
+					$get = $db -> query("SELECT nameth,nameen,type,adv1,adv2,adv3,COALESCE(score_paper, 0)+COALESCE(score_poster, 0)+COALESCE(score_present, 0) AS score FROM PBL_group WHERE code='$code'");
 					if (!$get) {
 						errorMessage(3, "Error loading your data. Please try again.");
 						slog("PBL", "load", "info", $code, "fail", "", "InvalidQuery");
