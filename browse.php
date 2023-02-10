@@ -98,8 +98,8 @@
 							await ajax(cv.API_URL+"information", {type: "person", act: "student", param: dat.member.join(",")}).then(function(dat2) {
 								var index = 1, listBody = "";
 								dat2.list.forEach(es => {
-									listBody += '<tr><td>'+index.toString()+'.</td><td>'+es.fullname+' (<a href="/'+es.ID+'" target="_blank" draggable="false">'+es.nickname+'</a>)</td><td>เลขที่ '+es.number+'</td><td>';
-									if (index++ == 1) listBody += '<a role="button" class="default" disabled>หัวหน้ากลุ่ม</a>';
+									listBody += '<tr><td>'+index.toString()+'.</td><td>'+es.fullname+' (<a href="/user/'+es.ID+'" target="_blank" draggable="false">'+es.nickname+'</a>)</td><td>เลขที่ '+es.number+'</td><td>';
+									if (index++ == 1) listBody += '<a role="button" class="blue hollow pill" disabled>หัวหน้ากลุ่ม</a>';
 									listBody += '</td></tr>';
 								}); $('main .namelist tbody').html(listBody);
 							});
@@ -110,18 +110,18 @@
 					$("main button.open").attr("disabled", "");
 					var opt = parseInt($('main .form select[name="wfs"]').val());
 					// Grader element
-					if (opt >= 9 && opt <= 11) {
+					if (opt >= 10 && opt <= 11) {
 						$("main .notRequirement").fadeOut(); // .toggle("blind");
 						$("main .grader .field").removeAttr("disabled");
 					} else {
 						$("main .notRequirement").fadeIn(); // .toggle("blind");
 						$("main .grader .field").attr("disabled", "");
 						$('main .grader [name="score:in"]').val("");
-					} let maxScore; switch (opt) {
+					} let maxScore = 1; /* switch (opt) {
 						case 9: maxScore = 3; break;
 						case 10: case 11: maxScore = 1; break;
 						default: maxScore = "";
-					} $('main .grader [name="score:max"]').val(maxScore);
+					} */ $('main .grader [name="score:max"]').val(maxScore);
 					$('main .grader [name="score:in"]').attr("max", maxScore);
 					$("main .grader button").attr("disabled", "");
 					// Render file
@@ -207,7 +207,7 @@
 					<button class="open blue" onClick="PBL.viewFile()" disabled>เปิด</button>
 				</div>
 				<form class="grader form message cyan" style="display: none;">
-					<p class="notRequirement message yellow">กรุณาเปิดไฟล์<u>เล่มรายงาน</u> <u>บทคัดย่อ</u>หรือไฟล์<u>โปสเตอร์</u>เพื่อใช้ช่องลงคะแนน</p>
+					<p class="notRequirement message yellow">กรุณาเปิดไฟล์<u>บทคัดย่อ</u>หรือไฟล์<u>โปสเตอร์</u>เพื่อใช้ช่องลงคะแนน</p>
 					<div class="field group split" disabled>
 						<div class="group">
 							<span>ได้</span>
@@ -226,7 +226,7 @@
 				<p>สนทนากับนักเรียน</p>
 				<div class="chat" id="chat">
 					<span class="start">
-						<button class="gray hollow" onClick="chatApp.init()">Add a comment</button>
+						<button class="gray hollow" onClick="chatApp.init(true)">Add a comment</button>
 					</span>
 				</div>
 			</div>

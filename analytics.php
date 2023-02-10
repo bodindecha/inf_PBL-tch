@@ -11,77 +11,7 @@
 	$subCols = array("class","group_amount","yes_mindmap","no_mindmap","yes_IS1_1","no_IS1_1","yes_IS1_2","no_IS1_2","yes_IS1_3","no_IS1_3","yes_report_1","no_report_1","yes_report_2","no_report_2","yes_report_3","no_report_3","yes_report_4","no_report_4","yes_report_5","no_report_5","yes_full_report","no_full_report","yes_abstract","no_abstract","yes_poster","no_poster");
 	$branches = str_split("ABCDEFGHIJKLM ");
 
-	if (isset($_GET["export"])) {
-		require_once($dirPWroot."resource/php/core/config.php");
-		require($dirPWroot."resource/php/core/db_connect.php");
-		$reqType = "csv";
-		$dltime = date("Y-m-d H_i_s", time());
-		switch ($ds) {
-			case "branches": {
-				$name = "สาขาโครงงาน";
-				$result = $db -> query("SELECT grade,room,type,COUNT(code) AS amount,GROUP_CONCAT(COALESCE(nameth, COALESCE(nameen, code))) AS names FROM PBL_group WHERE year=$year AND mbr1 IS NOT NULL GROUP BY grade,room,type ORDER BY grade,room,(CASE type WHEN '' THEN 1 ELSE 0 END),type");
-				$has_result = ($result && $result -> num_rows);
-				$delimeter = ($reqType == "tsv" ? "\t" : ",");
-				$outputData = "\"ระดับชั้น\"$delimeter\"ห้อง\"$delimeter\"สาขาโครงงาน\"$delimeter\"จำนวนโครงงาน\"";
-				if ($has_result) { while ($er = $result -> fetch_assoc()) {
-					// Modify
-					if (empty($er["type"])) $brance = "ยังไม่มีสาขา";
-					else $branch = pblcode2text($er["type"])["th"];
-					// Concat
-					$outputData .= "\n\"".$er["grade"]."\"$delimeter\"".$er["room"]."\"$delimeter\"".$branch."\"$delimeter\"".$er["amount"]."\"";
-				} }
-			} break;
-			case "title-list": {
-				$name = "รายชื่อโครงงาน";
-				$result = $db -> query("SELECT grade,room,code,COALESCE(nameth, COALESCE(nameen, 'ไม่มีชื่อโครงงาน')) AS name FROM PBL_group WHERE year=$year AND mbr1 IS NOT NULL ORDER BY grade,room,name");
-				$has_result = ($result && $result -> num_rows);
-				$delimeter = ($reqType == "tsv" ? "\t" : ",");
-				$outputData = "\"ระดับชั้น\"$delimeter\"ห้อง\"$delimeter\"รหัสโครงงาน\"$delimeter\"ชื่อโครงงาน\"";
-				if ($has_result) { while ($er = $result -> fetch_assoc()) {
-					// Modify
-					if ($er["name"]=="") $er["name"] = "~ไม่มีชื่อโครงงาน~";
-					// Concat
-					$outputData .= "\n\"".$er["grade"]."\"$delimeter\"".$er["room"]."\"$delimeter\"".$er["code"]."\"$delimeter\"".$er["name"]."\"";
-				} }
-			} break;
-		}
-		$name = "PBL $name $dltime.$reqType";
-		switch ($reqType) {
-			case "csv": $mime = "text/csv"; break;
-			case "tsv": $mime = "text/tsv"; break;
-			case "json": $mime = "application/json"; break;
-		} if ($reqType == "json") $outputData = json_encode($outputData, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT);
-		// --- Start Force Download ---
-		if (ob_get_contents()) {
-			die("Some data has already been output, can't export data file");
-		}
-		header("Content-Description: File Transfer");
-		if (headers_sent()) {
-			die("Some data has already been output to browser, can't export data file");
-		}
-		header("Cache-Control: private, must-revalidate, post-check=0, pre-check=0, max-age=1");
-		# header("Cache-Control: public, must-revalidate, max-age=0"); // HTTP/1.1
-		header("Pragma: public");
-		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
-		header("Last-Modified: ".gmdate("D, d M Y H:i:s")." GMT");
-		// force download dialog
-		if (strpos(php_sapi_name(), "cgi") === false) {
-			# header("Content-Type: $mime", true);
-			header("Content-Type: application/force-download");
-			header("Content-Type: application/octet-stream", false);
-			header("Content-Type: application/download", false);
-			header("Content-Type: $mime", false);
-			header("Content-Length: ".strlen(strval($outputData)));
-		} else header("Content-Type: $mime");
-		// use the Content-Disposition header to supply a recommended filename
-		header("Content-Disposition: attachment; filename=\"".basename($name)."\"");
-		header("Content-Transfer-Encoding: binary");
-		# TCPDF_STATIC::sendOutputData($this->getBuffer(), $this->bufferlen);
-		echo strval($outputData);
-		// --- End Force Download ---
-		slog("PBL", "download", "report", "$ds.$reqType", "pass");
-		exit(0);
-	}
+	if (isset($_GET["export"])) require_once("api/export-data.php");
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -127,6 +57,12 @@
 				</form>
 				<div class="data">
 				<?php if ($ds == "submission") { ?>
+					<form class="form inline sh-form">
+						<label class="group">
+							<input type="checkbox" class="switch" onChange="toggleSubs(this)" checked />
+							แสดงไฟล์ย่อยและใบงาน
+						</label>
+					</form>
 					<div class="table"><table center><thead>
 						<tr>
 							<th rowspan="2">ชั้น</th>
@@ -184,8 +120,15 @@
 							$("main .table tbody:not(:nth-of-type(2n+1):nth-last-of-type(2n+3)) td:nth-of-type(n+5):nth-last-child(n+17)").attr("class", "dim");
 							$("main .table tbody:first-of-type tr:not(:nth-child(2n-1):nth-last-child(2n+3)) td:nth-of-type(n+5):nth-last-child(n+17)").attr("class", "dim");
 						}
+						function toggleSubs(me) {
+							var state = me.checked,
+								target = $("main .table tbody td:nth-child(n+5):nth-last-child(n+7), main .table thead th:nth-child(n+4):nth-last-child(n+4), main .table thead td:nth-child(n+3):nth-last-child(n+7)");
+							if (state) target.fadeIn();
+							else target.fadeOut()
+						}
 					</script>
 					<style type="text/css">
+						main .sh-form { margin-bottom: 10px; }
 						main tbody[name="gA"] tr:first-child { background-color: #D6E1F6; }
 						main tbody[name="gA"] tr:nth-child(2n+3) { background-color: #E9F1FE; }
 						main td:nth-child(2), main th:nth-child(2) { border-right: 2px solid var(--clr-bs-gray) !important; }

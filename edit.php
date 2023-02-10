@@ -110,7 +110,6 @@
             }, validate_field = pUI.form.btnState,
             sS = {complete: () => PBL.addMember()};
 		</script>
-		<script type="text/javascript" src="/t/PBL/v2/tools/PBL-teacher.min.js"></script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/group-edit.min.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/all-PBL.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/fs-teacher.js"></script>
@@ -159,7 +158,7 @@
                     }
                 </style>
                 <div class="manual">
-                    <a role="button" class="blue" href="javascript:PBL.help('document')" data-href="/go?url=">
+                    <a role="button" class="blue" href="javascript:PBL.help('document')" data-href="/go?url=https%3A%2F%2Fdrive.google.com%2Fa%2Fbodin.ac.th%2Ffile%2Fd%2F1-CUAnQJUDdowRi0hAoq5v9kZwZIzQrx3%2Fpreview">
                         <i class="fa fa-file-text-o"></i>
                         <span>คู่มือการใช้งานระบบ</span>
                     </a>

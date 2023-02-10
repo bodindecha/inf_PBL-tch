@@ -149,7 +149,7 @@
 						slog("PBL", "del", "group", $code, "fail", "", "NotExisted");
 					} else {
 						$read = $get -> fetch_array(MYSQLI_ASSOC);
-						$success = $db -> query("UPDATE PBL_group SET nameth='',nameen='',type='',mbr".implode("=NULL,mbr", str_split("1234567"))."=NULL,maxMember=6,statusOpen='Y',publishWork='Y',adv1=NULL,adv2=NULL,adv3=NULL,fileStatus=0,fileType=';;;;;;;;;;;',score=NULL WHERE code='$code'");
+						$success = $db -> multi_query("UPDATE PBL_group SET nameth='',nameen='',type='',mbr".implode("=NULL,mbr", str_split("1234567"))."=NULL,maxMember=6,statusOpen='Y',publishWork='Y',adv".implode("=NULL,adv", str_split("123"))."=NULL,fileStatus=0,fileType=';;;;;;;;;;;',grader=NULL,mrker".implode("=NULL,mrker", str_split("12345"))."=NULL,score_poster=NULL,score_present=NULL WHERE code='$code'; DELETE FROM PBL_score WHERE code='$code'");
 						if ($success) {
 							if (intval($read["fileStatus"])) { // Delete uploaded file(s)
 								$status = $read["fileStatus"];
@@ -159,9 +159,15 @@
 								function bit2bool($fileStatus) {
 									return boolval($fileStatus);
 								} $status = array_combine($fileCfg, array_map("bit2bool", str_split($status)));
-								foreach ($fileCfg as $file) {
+								/* foreach ($fileCfg as $file) {
 									if (boolval($status[$file])) {
 										$location = $dirPWroot."resource/upload/PBL/$year/$file/$grade/$code.".$fileType[array_search($file, $fileCfg)];
+										if (file_exists($location)) unlink($location);
+									}
+								} */
+								for ($fIdx = 0; $fIdx <= count($fileCfg); $fIdx++) {
+									if ($status[$fIdx]) {
+										$location = $dirPWroot."resource/upload/PBL/$year/".$fileCfg[$fIdx]."/$grade/$code.".$fileType[$fIdx];
 										if (file_exists($location)) unlink($location);
 									}
 								}

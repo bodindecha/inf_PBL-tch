@@ -8,7 +8,7 @@
         case "group": {
 			$code = escapeSQL($command);
 			// No COALESCE on score -> only show when all is graded
-			$get = $db -> query("SELECT grade,room,lastupdate,type,mbr1,mbr2,mbr3,mbr4,mbr5,mbr6,mbr7,adv1,adv2,adv3,score_paper+score_poster+score_present AS score FROM PBL_group WHERE code='$code'");
+			$get = $db -> query("SELECT a.grade,a.room,a.lastupdate,a.type,a.mbr1,a.mbr2,a.mbr3,a.mbr4,a.mbr5,a.mbr6,a.mbr7,a.adv1,a.adv2,a.adv3,a.score_poster+a.score_present+(CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code WHERE a.code='$code' GROUP BY b.code");
 			if (!$get) {
 				errorMessage(3, "Error loading group's information. Please try again.");
 				slog("PBL", "load", "manifest", $code, "fail", "", "InvalidQuery");

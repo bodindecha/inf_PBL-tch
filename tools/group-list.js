@@ -260,8 +260,8 @@ const PBL = (function(d) {
                     await ajax(cv.API_URL+"information", {type: "person", act: "student", param: dat.member.join(",")}).then(function(dat2) {
                         var index = 1, listBody = "";
                         dat2.list.forEach(es => {
-                            listBody += '<tr><td>'+index.toString()+'.</td><td>'+es.fullname+' (<a href="/'+es.ID+'" target="_blank" draggable="false">'+es.nickname+'</a>)</td><td>เลขที่ '+es.number+'</td><td>';
-                            if (index++ == 1) listBody += '<a role="button" class="default" disabled>หัวหน้ากลุ่ม</a>';
+                            listBody += '<tr><td>'+index.toString()+'.</td><td>'+es.fullname+' (<a href="/user/'+es.ID+'" target="_blank" draggable="false">'+es.nickname+'</a>)</td><td>เลขที่ '+es.number+'</td><td>';
+                            if (index++ == 1) listBody += '<a role="button" class="blue hollow pill" disabled>หัวหน้ากลุ่ม</a>';
                             listBody += '</td></tr>';
                         }); $('main .results tbody[name="'+code+':member"]').html(listBody);
                     }); // Load advisor

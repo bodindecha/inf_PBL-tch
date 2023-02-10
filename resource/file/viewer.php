@@ -235,12 +235,15 @@
 			<?php
 				if (isset($error)) echo '<iframe src="/error/'.$error.'">Error: '.$error.'</iframe>';
 				else if ($extension == "pdf") {
+					if (filesize($real) <= 2.5e7) {
 			?>
 				<div class="container">
                     <div class="message yellow"><?=$_COOKIE['set_lang']=="th"?'หากไม่มีไฟล์ปรากฏขึ้นใน 10 วินาที กรุณากดปิดหน้านี้และเปิดใหม่':'If the nothing shows up within 10 seconds. Please re-open this viewer.'?></div>
                 </div>
 				<iframe src="https://docs.google.com/gview?embedded=true&url=https%3A%2F%2F<?=urlencode($_SERVER['SERVER_NAME']."/".$path)?>">Loading...</iframe>
 			<?php } else { ?>
+				<iframe src="/<?=$path?>">Loading...</iframe>
+			<?php } } else { ?>
 			<div class="container">
 				<div class="wrapper">
 					<div><img src="/<?=$path?>"></div>
