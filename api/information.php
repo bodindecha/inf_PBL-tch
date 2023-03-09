@@ -1,14 +1,14 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
-    require_once($dirPWroot."resource/php/extend/_RGI.php");
-    // Execute
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	require_once($dirPWroot."resource/php/extend/_RGI.php");
+	// Execute
 	$self = $_SESSION["auth"]["user"]; $year = $_SESSION["stif"]["t_year"];
 	if (empty($self)) errorMessage(3, "You are not signed-in. Please reload and try again."); else
-    switch ($type) {
-        case "group": {
+	switch ($type) {
+		case "group": {
 			$code = escapeSQL($command);
 			// No COALESCE on score -> only show when all is graded
-			$get = $db -> query("SELECT a.grade,a.room,a.lastupdate,a.type,a.mbr1,a.mbr2,a.mbr3,a.mbr4,a.mbr5,a.mbr6,a.mbr7,a.adv1,a.adv2,a.adv3,a.score_poster+a.score_present+(CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code WHERE a.code='$code' GROUP BY b.code");
+			$get = $db -> query("SELECT a.grade,a.room,a.lastupdate,a.type,a.mbr1,a.mbr2,a.mbr3,a.mbr4,a.mbr5,a.mbr6,a.mbr7,a.adv1,a.adv2,a.adv3,a.score_poster+c.score+(CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code LEFT JOIN user_score c ON c.stdid=a.mbr1 AND c.year=a.year AND c.subj='PBL' AND c.field='oph-act' WHERE a.code='$code' GROUP BY b.code");
 			if (!$get) {
 				errorMessage(3, "Error loading group's information. Please try again.");
 				slog("PBL", "load", "manifest", $code, "fail", "", "InvalidQuery");
@@ -27,7 +27,7 @@
 				));
 			}
 		} break;
-        case "person": {
+		case "person": {
 			switch ($command) {
 				case "student": {
 					$query = escapeSQL($attr);

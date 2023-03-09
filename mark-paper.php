@@ -1,5 +1,5 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "ตรวจเล่มรายงาน";
 	$header_desc = "ขั้นที่ 2: ประเมินผล";
@@ -381,7 +381,7 @@
 				<div class="wrapper">
 					<div style="--page:1;">
 						<div class="page page-1">
-							<form class="form oform" style="display: none;" onSubmit="return false;">
+							<form class="form oform" onSubmit="return false;" style="display: none;" onSubmit="return false;">
 								<div class="group">
 									<span><i class="material-icons">search</i></span>
 									<input type="search" name="find" placeholder="Find..." onInput="PBL.filterByText()">

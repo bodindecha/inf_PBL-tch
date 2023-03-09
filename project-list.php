@@ -1,10 +1,10 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "รายชื่อกลุ่ม PBL";
 	$header_desc = "รายการโครงงาน PBL";
 	$home_menu = "is-pbl";
-    $forceExternalBrowser = true;
+	$forceExternalBrowser = true;
 
 	require_once($dirPWroot."resource/php/core/config.php");
 ?>
@@ -92,9 +92,9 @@
 				color: var(--clr-pp-red-900);
 			}
 		</style>
-        <!--link rel="stylesheet" href="/t/PBL/v2/tools/components.min.css" /-->
+		<!--link rel="stylesheet" href="/t/PBL/v2/tools/components.min.css" /-->
 		<!--link rel="stylesheet" href="/resource/css/extend/all-PBL.css" /-->
-        <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" /-->
+		<!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" /-->
 		<script type="text/javascript">
 			$(document).ready(function() {
 				// PBL.init();
@@ -240,7 +240,7 @@
 						<button class="red hollow" onClick="return pUI.filter.reset(true)" data-title="Clear" type="reset"><i class="material-icons">backspace</i></button>
 					</div>
 				</form>
-				<form class="form oform" style="display: none;">
+				<form class="form oform" onSubmit="return false;" style="display: none;">
 					<div class="group finder">
 						<span><i class="material-icons">search</i></span>
 						<input type="search" name="find" placeholder="Find..." onInput="pUI.filter.update()">

@@ -39,7 +39,7 @@
 </style>
 <script type="text/javascript">
 	const isSafari = (navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") < 0);
-    $(function(){
+	$(function(){
 		// SEO & lighthouse
 		document.querySelector("html").setAttribute("lang", ppa.getCookie("set_lang"));
 		document.querySelectorAll("html body img:not([alt])").forEach((ei) => {
@@ -50,7 +50,7 @@
 		<?php if($require_sso)echo"sys.auth.sso('".($_GET['return_url']??"")."');"; ?>
 		var main_height = $("html body main").height();
 		$("header div.head-item a").on("click", function(){setTimeout(function(){$(window).trigger("resize");},500);});
-    	// Resizing
+		// Resizing
 		var $window = $(window).on('resize', function(){
 			$("html body").css("--window-height", $(window).height().toString()+"px");
 			var tlbw = [1.75, 0]; document.querySelectorAll("html body header section:nth-child(1) div.ocs div.head-item:not([hidden])").forEach((o) => { tlbw[0] += $(o).width(); }); $("html body header section:nth-child(1) div.ocs").css("min-width", tlbw[0].toString()+"px");
@@ -80,7 +80,7 @@
 			let ns = location.search.substr(1).split("&").filter(ep => !(ep.startsWith("fbclid=") || ep=="openExternalBrowser=1")).join("&");
 			history.replaceState(null, null, location.pathname+(ns.length ? "?"+ns : "")+location.hash);
 		}
-    });
+	});
 	// Scrolling
 	$(document).scroll(function() {
 		// setHash($(document).scrollTop());

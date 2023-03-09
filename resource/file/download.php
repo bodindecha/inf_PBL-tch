@@ -6,6 +6,7 @@
         $path = $_REQUEST["furl"];
         if (preg_match("/^\/.+$/", $path)) $path = ltrim($path, "/");
         if (!preg_match("/^(css|file|fonts|images|js|json|upload)\/.+\.(png|jpg|jpeg|heic|heif|gif|pdf)(?.+)?/", $path)) $error = "403";
+        $path = preg_replace("/(((^|\/)?\.\.?\/)+|\.$)/", "/", $path);
         $path = $dirPWroot."resource/$path";
 
 		if (isset($_REQUEST["name"])) $name = trim($_REQUEST["name"]).".".pathinfo($path, PATHINFO_EXTENSION);

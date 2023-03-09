@@ -1,5 +1,5 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	require_once($dirPWroot."resource/hpe/init_ps.php");
 
 	if (isset($_REQUEST["furl"]) && !empty(trim($_REQUEST["furl"]))) {
@@ -238,8 +238,8 @@
 					if (filesize($real) <= 2.5e7) {
 			?>
 				<div class="container">
-                    <div class="message yellow"><?=$_COOKIE['set_lang']=="th"?'หากไม่มีไฟล์ปรากฏขึ้นใน 10 วินาที กรุณากดปิดหน้านี้และเปิดใหม่':'If the nothing shows up within 10 seconds. Please re-open this viewer.'?></div>
-                </div>
+					<div class="message yellow"><?=$_COOKIE['set_lang']=="th"?'หากไม่มีไฟล์ปรากฏขึ้นใน 10 วินาที กรุณากดปิดหน้านี้และเปิดใหม่':'If the nothing shows up within 10 seconds. Please re-open this viewer.'?></div>
+				</div>
 				<iframe src="https://docs.google.com/gview?embedded=true&url=https%3A%2F%2F<?=urlencode($_SERVER['SERVER_NAME']."/".$path)?>">Loading...</iframe>
 			<?php } else { ?>
 				<iframe src="/<?=$path?>">Loading...</iframe>

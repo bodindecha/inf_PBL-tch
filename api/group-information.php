@@ -1,15 +1,15 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
-    require_once($dirPWroot."resource/php/extend/_RGI.php");
-    // Execute
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	require_once($dirPWroot."resource/php/extend/_RGI.php");
+	// Execute
 	$self = $_SESSION["auth"]["user"]; $year = $_SESSION["stif"]["t_year"];
 	if (empty($self)) errorMessage(3, "You are not signed-in. Please reload and try again."); else
-    switch ($type) {
-        case "group": {
+	switch ($type) {
+		case "group": {
 			switch ($command) {
 				case "title": {
 					$code = escapeSQL($attr["code"]);
-					$get = $db -> query("SELECT a.nameth,a.nameen,a.type,a.adv1,a.adv2,a.adv3,a.score_poster+a.score_present+(CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code WHERE a.code='$code' GROUP BY b.code");
+					$get = $db -> query("SELECT a.nameth,a.nameen,a.type,a.adv1,a.adv2,a.adv3,a.score_poster+c.score+(CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code LEFT JOIN user_score c ON c.stdid=a.mbr1 AND c.year=a.year AND c.subj='PBL' AND c.field='oph-act' WHERE a.code='$code' GROUP BY b.code");
 					if (!$get) {
 						errorMessage(3, "Error loading your data. Please try again.");
 						slog("PBL", "load", "info", $code, "fail", "", "InvalidQuery");

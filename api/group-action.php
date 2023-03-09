@@ -1,11 +1,11 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
-    require_once($dirPWroot."resource/php/extend/_RGI.php");
-    // Execute
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	require_once($dirPWroot."resource/php/extend/_RGI.php");
+	// Execute
 	$self = $_SESSION["auth"]["user"]; $year = $_SESSION["stif"]["t_year"];
 	if (empty($self)) errorMessage(3, "You are not signed-in. Please reload and try again."); else
-    switch ($type) {
-        case "create": {
+	switch ($type) {
+		case "create": {
 			if (empty($attr["mbr1"])) {
 				errorMessage(3, "Unable to create group. Please add group leader and try again.");
 				slog("PBL", "new", "group", "", "fail", "", "Empty");
@@ -61,7 +61,7 @@
 									}
 			} } } } } }
 		} break;
-        case "update": {
+		case "update": {
 			switch ($command) {
 				case "information": {
 					$code = escapeSQL($attr["code"]);
@@ -121,7 +121,7 @@
 				default: errorMessage(1, "Invalid command"); break;
 			}
 		} break;
-        case "delete": {
+		case "delete": {
 			switch ($command) {
 				case "member": {
 					$code = escapeSQL($attr["code"]);
@@ -149,7 +149,7 @@
 						slog("PBL", "del", "group", $code, "fail", "", "NotExisted");
 					} else {
 						$read = $get -> fetch_array(MYSQLI_ASSOC);
-						$success = $db -> multi_query("UPDATE PBL_group SET nameth='',nameen='',type='',mbr".implode("=NULL,mbr", str_split("1234567"))."=NULL,maxMember=6,statusOpen='Y',publishWork='Y',adv".implode("=NULL,adv", str_split("123"))."=NULL,fileStatus=0,fileType=';;;;;;;;;;;',grader=NULL,mrker".implode("=NULL,mrker", str_split("12345"))."=NULL,score_poster=NULL,score_present=NULL WHERE code='$code'; DELETE FROM PBL_score WHERE code='$code'");
+						$success = $db -> multi_query("UPDATE PBL_group SET nameth='',nameen='',type='',mbr".implode("=NULL,mbr", str_split("1234567"))."=NULL,maxMember=6,statusOpen='Y',publishWork='Y',adv".implode("=NULL,adv", str_split("123"))."=NULL,fileStatus=0,fileType=';;;;;;;;;;;',grader=NULL,mrker".implode("=NULL,mrker", str_split("12345"))."=NULL,score_poster=NULL WHERE code='$code'; DELETE FROM PBL_score WHERE code='$code'");
 						if ($success) {
 							if (intval($read["fileStatus"])) { // Delete uploaded file(s)
 								$status = $read["fileStatus"];

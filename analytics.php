@@ -1,5 +1,5 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "สรุปสถิติ";
 	$header_desc = "ประมวลข้อมูลสถิติ";
@@ -18,6 +18,8 @@
 	<head>
 		<?php require($dirPWroot."resource/hpe/heading.php"); require($dirPWroot."resource/hpe/init_ss.php"); ?>
 		<style type="text/css">
+			main .data > * { margin: 0 0 10px; }
+			main .data > *:last-child { margin: 0; }
 			main .table .none { color: #800B0B; }
 			main .table .done { color: #307611; }
 			main .table .dim { color: #EFEFEF; }
@@ -34,13 +36,13 @@
 						document.querySelector('main .form [name="dataset"] option[value="'+dataset+'"]').selected = true;
 					}
 				}
-				try { tblFx(); } catch (e) {}
+				if (typeof tblFx !== "undefined") tblFx();
 			})
 		</script>
 	</head>
 	<body>
 		<?php require($dirPWroot."resource/hpe/header.php"); ?>
-		<main shrink="<?php echo($_COOKIE['sui_open-nt'])??"false"; ?>">
+		<main shrink="<?php echo($_COOKIE['sui_open-nt'])??"false"; ?>" <?php if (($ds??"") == "list") echo 'class="rainbow-bg"'; ?>>
 			<div class="container">
 				<h2><?=$header_desc?></h2>
 				<form class="form inline">
@@ -50,7 +52,7 @@
 							<option value selected disabled>---กรุณาเลือก---</option>
 							<option value="submission">การส่งงาน</option>
 							<option value="branches">สาขาโครงงาน</option>
-							<option value="title-list">รายชื่อโครงงาน</option>
+							<option value="list">อื่นๆ (ดาวน์โหลด)</option>
 						</select>
 					</div>
 					<button class="blue" disabled>โหลดดู</button>
@@ -161,7 +163,7 @@
 								else echo '<tr><td>'.pblcode2text($branch)["th"].'</td><td name="sum"></td>';
 								for ($i = 1; $i <= 6; $i++) {
 									if ($get[$i][$call[$i]]["branch"]==$branch) {
-										echo '<td>'.$get[$i][$call[$i]]["amount"].'</td>';
+										echo '<td>'.($get[$i][$call[$i]]["amount"] ?? "0").'</td>';
 										$call[$i] += 1;
 									} else echo '<td>0</td>';
 								} echo '</tr>';
@@ -175,6 +177,12 @@
 					</div>
 					<script type="text/javascript">
 						function tblFx() {
+							$('main .dl a[role="button"]').on("click", async function() {
+								var btn = $(this);
+								btn.attr("disabled", "");
+								setTimeout(function() { btn.removeAttr("disabled"); }, 10000);
+							});
+							// Calculations
 							for (let i = 1; i <= 14; i++) {
 								var sumRow = 0;
 								document.querySelectorAll('main .table tbody tr:nth-child('+i.toString()+') td:nth-child(n+3)').forEach(ec => {
@@ -204,19 +212,73 @@
 							width: fit-content;
 						}
 					</style>
-				<?php } else if ($ds == "title-list") { ?>
+				<?php } else if ($ds == "list") { ?>
+					<?php if (!has_perm("PBL")) echo '<center class="message red">สามารถเข้าถึงได้เฉพาะหัวหน้างานพัฒนาการศึกษาโดยใช้โครงงานเป็นฐาน (IS/PBL) เท่านั้น</center>'; else { ?>
 					<p>เนื่องจากข้อมูลมีปริมาณมาก จึงไม่สามารถนำแสดงได้</p>
-					<div class="dl">
-						<iframe name="dlframe" hidden></iframe>
-						<a role="button" href="?dataset=title-list&export=download" target="dlframe" class="green" data-title="แบบละเอียด"><i class="material-icons">download</i> ดาวน์โหลด</a>
-					</div>
+					<center class="message yellow">ไฟล์ทั้งหมดเป็นประเภท Comma Separated Value (.csv) ดังนั้นจึงควรเปิดบนคอมพิวเตอร์หรือโน้ตบุ๊ค</center>
+					<div class="dl table wrap"><table><thead><tr>
+						<th>ชื่อรายการ</th><th>กระทำการ</th>
+					</tr></thead><tbody>
+						<!-- Data loads -->
+					</tbody></table></div>
+					<iframe name="dlframe" hidden></iframe>
+					<script type="text/javascript">
+						function tblFx() {
+							const datalist = {
+								"GROUP_TYPE 1":		"รายชื่อโครงงาน",
+								"project-title":	[true, "รายชื่อโครงงานทั้งหมด"],
+								"project-group":	[true, "ข้อมูลรายกลุ่มฉบับย่อ"],
+								"missing-mindmap":	[true, "ที่ยังไม่ส่ง: แผนผังความคิด"],
+								"missing-paper":	[true, "ที่ยังไม่ส่ง: เล่มรายงาน"],
+								"missing-poster":	[true, "ที่ยังไม่ส่ง: โปสเตอร์"],
+								"GROUP_TYPE 2":		"รายชื่อบุคคล",
+								"group-member":		[true, "รายชื่อสมาชิกกลุ่ม"],
+								"std-submission":	[true, "การส่งเล่มรายงานนักเรียน"],
+								"student-score":	[true, "คะแนนแยกส่วนของนักเรียน"],
+								"GROUP_TYPE 3":		"รายงานกรรมการ",
+								"cmte-progress":	[true, "ความคืบหน้าการให้คะแนนเล่มรายงาน"],
+								"cmte-score":		[true, "การให้คะแนนแต่ละโครงงานของกรรมการ"],
+								"GROUP_TYPE 4":		"ผลคะแนนและรางวัล (รายโครงงาน)",
+								"project-score":	[true, "คะแนนเฉลี่ย (เต็ม 100)"],
+								"project-result":	[true, "ผล (ผ/มผ) และคะแนน (เต็ม 3)"],
+								"GROUP_TYPE 5":		"สรุปปลายปีการศึกษา",
+								"present-list":		[false, "นักเรียนที่ขึ้นนำเสนอบนหอประชุม"],
+								"cert-student":		[true, "เกียรติบัตรนักเรียน"],
+								"cert-teacher":		[true, "เกียรติบัตรครู"],
+							}; var table = "";
+							Object.keys(datalist).forEach(keyname => {
+								if (keyname.startsWith("GROUP_TYPE")) table += '<tr><td colspan="2" class="center">'+datalist[keyname]+'</td></tr>';
+								else if (keyname.length) table += '<tr id="name='+keyname+'"><td>'+datalist[keyname][1]+'</td><td><a role="button" href="?dataset='+keyname+'&export=download" target="dlframe" class="green icon hollow small" draggable="false" '+(datalist[keyname][0]?"":"disabled")+'><i class="material-icons">download</i>ดาวน์โหลด</a></td></tr>'
+							}); $("main .dl tbody").append(table);
+							$('main .dl a[role="button"]').on("mouseenter touchstart", function() {
+								$(this).not(".loading").removeClass("hollow");
+							}).on("mouseleave touchend", function() {
+								$(this).not(".loading").addClass("hollow");
+							}).on("click", async function() {
+								var btn = $(this);
+								btn.addClass("orange loading").attr("disabled", "").removeClass("green hollow");
+								setTimeout(function() {
+									btn.addClass("green hollow").removeClass("orange loading").removeAttr("disabled");
+								}, 10000);
+							});
+							if (location.hash.length>1) {
+								$('main .dl [id="'+location.hash.substring(1)+'"]').addClass("target");
+								app.io.URL.removeHash("name=");
+							}
+						}
+					</script>
 					<style type="text/css">
-						main div.dl a[role="button"] {
-							margin: 0px auto;
+						main .dl th:nth-child(1) { padding-left: 5px; text-align: left; }
+						main .dl tr > td:nth-child(1) { padding-left: 5px; }
+						main .dl tr > *:nth-child(2) { min-width: fit-content; width: 20%; }
+						main .dl tr > td[colspan] { padding: 3.75px 2.5px; }
+						main .dl a[role="button"] {
+							margin: 2.5px auto;
 							width: fit-content;
 						}
+						main .target { background-image: linear-gradient(to right, rgba(106, 238, 193, 0.375), rgba(175, 99, 224, 0.25), rgba(106, 238, 193, 0.375)); }
 					</style>
-				<?php } ?>
+				<?php } } ?>
 				</div>
 			</div>
 		</main>

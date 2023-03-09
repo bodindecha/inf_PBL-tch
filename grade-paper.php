@@ -1,5 +1,5 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "ตรวจเล่มรายงาน";
 	$header_desc = "ขั้นที่ 1: ผ่าน/ไม่ผ่าน";
@@ -122,7 +122,7 @@
 				<div class="loading medium">
 					<img src="/resource/images/widget-load_spinner.gif" />
 				</div>
-				<form class="form oform" style="display: none;">
+				<form class="form oform" onSubmit="return false;" style="display: none;">
 					<div class="group">
 						<span><i class="material-icons">search</i></span>
 						<input type="search" name="find" placeholder="Find..." onInput="PBL.filterByText()">

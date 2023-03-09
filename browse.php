@@ -1,10 +1,10 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "ดูไฟล์ของโครงงาน PBL";
 	$header_desc = "ตรวจงานของกลุ่ม";
 	$home_menu = "is-pbl";
-    $forceExternalBrowser = true;
+	$forceExternalBrowser = true;
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">

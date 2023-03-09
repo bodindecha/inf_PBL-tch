@@ -1,18 +1,18 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
-    require_once($dirPWroot."resource/php/extend/_RGI.php");
-    require_once($dirPWroot."resource/php/core/config.php");
-    // Permission checks
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	require_once($dirPWroot."resource/php/extend/_RGI.php");
+	require_once($dirPWroot."resource/php/core/config.php");
+	// Permission checks
 	function has_perm($what, $mods = true) {
-        if (!(isset($_SESSION['auth']) && $_SESSION['auth']['type']=="t")) return false;
-        $mods = ($mods && $_SESSION['auth']['level']>=75); $perm = (in_array("*", $_SESSION['auth']['perm']) || in_array($what, $_SESSION['auth']['perm']));
-        return ($perm || $mods);
-    }
-    // Execute
+		if (!(isset($_SESSION['auth']) && $_SESSION['auth']['type']=="t")) return false;
+		$mods = ($mods && $_SESSION['auth']['level']>=75); $perm = (in_array("*", $_SESSION['auth']['perm']) || in_array($what, $_SESSION['auth']['perm']));
+		return ($perm || $mods);
+	}
+	// Execute
 	$self = $_SESSION["auth"]["user"]; $year = $_SESSION["stif"]["t_year"]; $isPBLmaster = has_perm("PBL");
 	if (empty($self)) errorMessage(3, "You are not signed-in. Please reload and try again."); else
-    switch ($type) {
-        case "list": {
+	switch ($type) {
+		case "list": {
 			switch ($command) {
 				case "paper-grade": {
 					$get_perm = $db -> query("SELECT type FROM PBL_cmte WHERE allow='Y' AND tchr='$self' AND year=$year");

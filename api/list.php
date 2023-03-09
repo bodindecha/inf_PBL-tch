@@ -1,18 +1,18 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
 	$checkAP = false;
-    require_once($dirPWroot."resource/php/extend/_RGI.php");
-    // Permission checks
-    function has_perm($what, $mods = true) {
-        if (!(isset($_SESSION['auth']) && $_SESSION['auth']['type']=="t")) return false;
-        $mods = ($mods && $_SESSION['auth']['level']>=75); $perm = (in_array("*", $_SESSION['auth']['perm']) || in_array($what, $_SESSION['auth']['perm']));
-        return ($perm || $mods);
-    }
-    // Execute
+	require_once($dirPWroot."resource/php/extend/_RGI.php");
+	// Permission checks
+	function has_perm($what, $mods = true) {
+		if (!(isset($_SESSION['auth']) && $_SESSION['auth']['type']=="t")) return false;
+		$mods = ($mods && $_SESSION['auth']['level']>=75); $perm = (in_array("*", $_SESSION['auth']['perm']) || in_array($what, $_SESSION['auth']['perm']));
+		return ($perm || $mods);
+	}
+	// Execute
 	$self = $_SESSION["auth"]["user"]; $year = $_SESSION["stif"]["t_year"];
 	if (empty($self)) errorMessage(3, "You are not signed-in. Please reload and try again."); else
-    switch ($type) {
-        case "group": {
+	switch ($type) {
+		case "group": {
 			switch ($command) {
 				case null: {
 					$loadLimit = 20;
@@ -78,59 +78,59 @@
 				default: errorMessage(1, "Invalid command"); break;
 			}
 		} break;
-        case "work": {
+		case "work": {
 			switch ($command) {
 				case "permission": {
 					$code = escapeSQL($attr);
-                    $grade = $_SESSION["auth"]["info"]["grade"] ?? "0";
-                    $room = $_SESSION["auth"]["info"]["room"] ?? "0";
-                    /***
-                     * แผนผังความคิด:		ครูที่สอนห้องนั้นทุกท่าน
-                     * ใบงาน IS1-1 ถึง 3:	-
-                     * เล่มรายงานบทที่ 1-5:   -
-                     * เล่มรายงานฉบับเต็ม:	  ครูที่ได้รับมอบหมายให้ตรวจโครงงานสาขานั้น
-                     * บทคัดย่อ:			ครูที่ได้รับมอบหมายให้ตรวจโครงงานสาขานั้น
-                     * โปสเตอร์:			ครูทุกท่านในระบบโรงเรียน
-                     * (ครูประจำชั้นและที่ปรึกษาโครงงานสามารถดูได้ทุกไฟล์)
-                     ***/
-                    $allow = array_fill(0, 11, 0);
-                    /***
-                     * null = Hide
-                     * 0    = Unclickable
-                     * 1    = View
-                     * 2    = Grade
-                     ***/
-                    $get = $db -> query("SELECT grade,room,type,adv1,adv2,adv3 FROM PBL_group WHERE code='$code'");
-                    if (!$get || $get -> num_rows <> 1) errorMessage(3, "Unable to get permission");
-                    else {
-                        $read = $get -> fetch_array(MYSQLI_ASSOC);
-                        $is_PBLmaster = has_perm("PBL");
-                        // Homeroom teacher
-                        if ($grade==$read["grade"] && $room==$read["room"]) $allow = array_fill(0, 11, 1);
-                        // Project advisor
-                        else if (in_array($self, array_values($read)) || $is_PBLmaster) $allow = array_fill(0, 11, 1);
-                        // Mindmap: Subject teachers
-                        $getTch = $db -> query("SELECT NULL FROM subj_teacher WHERE year=$year AND sem=1 AND tchr='$self'");
-                        if ($getTch -> num_rows == 1) $allow[0] = 1;
-                        // Full-report & Abstract: Committee
-                        # $getCat = $db -> query("SELECT GROUP_CONCAT(type) types FROM PBL_cmte WHERE allow='Y' AND tchr='$self' AND year=$year GROUP BY tchr");
-                        $getCat = $db -> query("SELECT NULL FROM PBL_cmte WHERE allow='Y' AND tchr='$self' AND year=$year AND type='".$read["type"]."'");
-                        if ($is_PBLmaster || $getCat -> num_rows == 1) {
-                            $allow[9] = 2;
-                            $allow[10] = 1;
-                        } // All teacher in school
-                        $allow[11] = 1;
-                        // Special access
-                        if ($is_PBLmaster) {
-                            $allow[10] = 2;
-                            $allow[11] = 2;
-                        } // Check if IS
-                        if (!in_array($read["grade"], array("2", "4"))) {
-                            $allow[1] = null;
-                            $allow[2] = null;
-                            $allow[3] = null;
-                        } successState($allow);
-                    }
+					$grade = $_SESSION["auth"]["info"]["grade"] ?? "0";
+					$room = $_SESSION["auth"]["info"]["room"] ?? "0";
+					/***
+					 * แผนผังความคิด:		ครูที่สอนห้องนั้นทุกท่าน
+					 * ใบงาน IS1-1 ถึง 3:	-
+					 * เล่มรายงานบทที่ 1-5:   -
+					 * เล่มรายงานฉบับเต็ม:	  ครูที่ได้รับมอบหมายให้ตรวจโครงงานสาขานั้น
+					 * บทคัดย่อ:			ครูที่ได้รับมอบหมายให้ตรวจโครงงานสาขานั้น
+					 * โปสเตอร์:			ครูทุกท่านในระบบโรงเรียน
+					 * (ครูประจำชั้นและที่ปรึกษาโครงงานสามารถดูได้ทุกไฟล์)
+					 ***/
+					$allow = array_fill(0, 11, 0);
+					/***
+					 * null = Hide
+					 * 0	= Unclickable
+					 * 1	= View
+					 * 2	= Grade
+					 ***/
+					$get = $db -> query("SELECT grade,room,type,adv1,adv2,adv3 FROM PBL_group WHERE code='$code'");
+					if (!$get || $get -> num_rows <> 1) errorMessage(3, "Unable to get permission");
+					else {
+						$read = $get -> fetch_array(MYSQLI_ASSOC);
+						$is_PBLmaster = has_perm("PBL");
+						// Homeroom teacher
+						if ($grade==$read["grade"] && $room==$read["room"]) $allow = array_fill(0, 11, 1);
+						// Project advisor
+						else if (in_array($self, array_values($read)) || $is_PBLmaster) $allow = array_fill(0, 11, 1);
+						// Mindmap: Subject teachers
+						$getTch = $db -> query("SELECT NULL FROM subj_teacher WHERE year=$year AND sem=1 AND tchr='$self'");
+						if ($getTch -> num_rows == 1) $allow[0] = 1;
+						// Full-report & Abstract: Committee
+						# $getCat = $db -> query("SELECT GROUP_CONCAT(type) types FROM PBL_cmte WHERE allow='Y' AND tchr='$self' AND year=$year GROUP BY tchr");
+						$getCat = $db -> query("SELECT NULL FROM PBL_cmte WHERE allow='Y' AND tchr='$self' AND year=$year AND type='".$read["type"]."'");
+						if ($is_PBLmaster || $getCat -> num_rows == 1) {
+							$allow[9] = 2;
+							$allow[10] = 1;
+						} // All teacher in school
+						$allow[11] = 1;
+						// Special access
+						if ($is_PBLmaster) {
+							$allow[10] = 2;
+							$allow[11] = 2;
+						} // Check if IS
+						if (!in_array($read["grade"], array("2", "4"))) {
+							$allow[1] = null;
+							$allow[2] = null;
+							$allow[3] = null;
+						} successState($allow);
+					}
 				} break;
 				default: errorMessage(1, "Invalid command"); break;
 			}
