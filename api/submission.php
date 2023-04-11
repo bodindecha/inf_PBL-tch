@@ -1,10 +1,10 @@
 <?php
-	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
 	require_once($dirPWroot."resource/php/extend/_RGI.php");
 	// Permission checks
 	function has_perm($what, $mods = true) {
-		if (!(isset($_SESSION['auth']) && $_SESSION['auth']['type']=="t")) return false;
-		$mods = ($mods && $_SESSION['auth']['level']>=75); $perm = (in_array("*", $_SESSION['auth']['perm']) || in_array($what, $_SESSION['auth']['perm']));
+		if (!(isset($_SESSION["auth"]) && $_SESSION["auth"]["type"]=="t")) return false;
+		$mods = ($mods && $_SESSION["auth"]["level"]>=75); $perm = (in_array("*", $_SESSION["auth"]["perm"]) || in_array($what, $_SESSION["auth"]["perm"]));
 		return ($perm || $mods);
 	}
 	// Execute

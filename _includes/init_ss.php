@@ -47,7 +47,7 @@
 			ei.setAttribute("alt", alt);
 		});
 		// App
-		<?php if($require_sso)echo"sys.auth.sso('".($_GET['return_url']??"")."');"; ?>
+		<?php if($require_sso)echo"sys.auth.sso('".($_GET["return_url"]??"")."');"; ?>
 		var main_height = $("html body main").height();
 		$("header div.head-item a").on("click", function(){setTimeout(function(){$(window).trigger("resize");},500);});
 		// Resizing

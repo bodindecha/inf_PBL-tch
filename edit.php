@@ -1,5 +1,5 @@
 <?php
-    $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+    $dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "แก้ไข้กลุ่ม PBL";
 	$header_desc = "แก้ไข้ข้อมูลโครงงาน";
@@ -61,7 +61,7 @@
 			$(document).ready(function() {
                 PBL.init();
             });
-            top.USER = "<?=$_SESSION['auth']['user']?>";
+            top.USER = "<?=$_SESSION["auth"]["user"]?>";
             const pUI = {
                 select: {
                     advisor: function(no) {

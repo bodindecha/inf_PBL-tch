@@ -1,5 +1,5 @@
 <?php
-	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "ตรวจเล่มรายงาน";
 	$header_desc = "ขั้นที่ 2: ประเมินผล";

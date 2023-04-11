@@ -1,6 +1,6 @@
 <?php
 	session_start();
-	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
 	require_once($dirPWroot."resource/php/core/reload_settings.php");
 	require_once($dirPWroot."resource/php/core/config.php"); require($dirPWroot."resource/php/core/db_connect.php");
 	require($dirPWroot."resource/php/core/getip.php");

@@ -1,5 +1,5 @@
 <?php
-	if (!isset($dirPWroot)) $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/") - 1);
+	if (!isset($dirPWroot)) $dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/") - 1);
 	if ($_SERVER["REDIRECT_URL"] == "/t/PBL/v2/api/export-data") {
 		header("Location: /error/914");
 		exit(0);

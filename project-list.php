@@ -1,5 +1,5 @@
 <?php
-	$dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "รายชื่อกลุ่ม PBL";
 	$header_desc = "รายการโครงงาน PBL";
@@ -100,7 +100,7 @@
 				// PBL.init();
 				PBL.init();
 			});
-			top.USER = "<?=$_SESSION['auth']['user']?>";
+			top.USER = "<?=$_SESSION["auth"]["user"]?>";
 			top.USER_ADMIN = !parseInt("<?=(has_perm("PBL") ? 0 : 1)?>");
 			const objEncrypt = obj => {
 				let queryHash = new URLSearchParams(obj);
@@ -171,8 +171,8 @@
 					<div class="group">
 						<span>สาขา</span>
 						<select name="type">
-							<option value=" "><?=($_COOKIE['set_lang']=="th"?"ทั้งหมด":"All")?></option>
-							<?php foreach (str_split("ABCDEFGHIJKLM") as $et) echo '<option value="'.$et.'">'.pblcode2text($et)[$_COOKIE['set_lang']].'</option>'; ?>
+							<option value=" "><?=($_COOKIE["set_lang"]=="th"?"ทั้งหมด":"All")?></option>
+							<?php foreach (str_split("ABCDEFGHIJKLM") as $et) echo '<option value="'.$et.'">'.pblcode2text($et)[$_COOKIE["set_lang"]].'</option>'; ?>
 						</select>
 					</div>
 					<div class="group">

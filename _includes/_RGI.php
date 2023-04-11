@@ -7,7 +7,7 @@
 	if (empty($type) || empty($command)) die(json_encode($return));
 	else $return["reason"] = array();
 	// Connect
-	if (!isset($dirPWroot)) $dirPWroot = str_repeat("../", substr_count($_SERVER['PHP_SELF'], "/")-1);
+	if (!isset($dirPWroot)) $dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
 	require_once($dirPWroot."resource/php/core/config.php"); require($dirPWroot."resource/php/core/db_connect.php");
 	require($dirPWroot."resource/php/core/getip.php"); # require_once($dirPWroot."resource/php/extend/getPermission.php");
 	function escapeSQL($input) {
