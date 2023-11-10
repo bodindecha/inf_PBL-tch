@@ -54,7 +54,13 @@
 				cursor: pointer; transition: var(--time-tst-xfast);
 			}
 			main .results > li[open] .accordian:hover { background-color: #D7E4F7; }
-			main .results .accordian .title { display: block; }
+			main .results .accordian .title { display: flex; justify-content: space-between; gap: 5px; }
+			main .results .accordian .title-name { display: block; }
+			main .results .accordian .title-code {
+				min-width: fit-content;
+				font-size: 0.9em; font-family: "Roboto Mono", monospace; color: var(--clr-gg-grey-500);
+				display: block;
+			}
 			main .results .extender { height: 0; }
 			/* main .results .extender * { transition: padding-top var(--li-trans), padding-bottom var(--li-trans), border-width var(--li-trans); } */
 			main .results > li[open] .extender { height: auto; }
@@ -144,8 +150,8 @@
 		</script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/PBL-teacher.min.js"></script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/group-list.min.js"></script>
-		<script type="text/javascript" src="/resource/js/lib/w3.min.js"></script>
-		<script type="text/javascript" src="/resource/js/lib/jquery-bez.min.js"></script>
+		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/w3.min.js"></script>
+		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/jQuery/bez.min.js"></script>
 	</head>
 	<body>
 		<?php require($dirPWroot."resource/hpe/header.php"); ?>

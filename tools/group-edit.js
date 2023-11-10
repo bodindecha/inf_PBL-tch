@@ -155,19 +155,31 @@ const PBL = (function(d) {
 	}, helpCentre = function(type = null) {
 		if (type == null) app.ui.lightbox.open("mid", {title: "ความช่วยเหลือ", allowclose: true, html: d.querySelector("main > .manual[hidden]").innerHTML});
 		else {
+			const helpURL = $('main > .manual[hidden] a[href$="PBL.help(\''+type+'\')"]').attr("data-href");
 			switch (type) {
 				case "document": {
 					// app.ui.notify(1, [2, "Help: Manual document is currently unavailable."]);
 					let size = [$(".lightbox .body").width().toString()+"px", $(".lightbox .body").height().toString()+"px"]
-					$(".lightbox .body").html('<iframe src="/go?url='+encodeURIComponent("https://drive.google.com/a/bodin.ac.th/file/d/1-CUAnQJUDdowRi0hAoq5v9kZwZIzQrx3/preview")+'" style="width:'+size[0]+';height:'+size[1]+';border:none">Loading...</iframe>');
+					$(".lightbox .body").html('<iframe src="'+helpURL+'" style="width:'+size[0]+';height:'+size[1]+';border:none">Loading...</iframe>');
 					$(".lightbox .body > iframe").animate({width: "90vw", height: "80vh"});
+					// app.ui.lightbox.close();
 				break; }
 				case "mediaVDO": {
-					app.ui.notify(1, [2, "Help: Manual video playlist is currently unavailable."]);
-					app.ui.lightbox.close();
+					// app.ui.notify(1, [2, "Help: Manual video playlist is currently unavailable."]);
+					let size = [$(".lightbox .body").width().toString()+"px", $(".lightbox .body").height().toString()+"px"]
+					$(".lightbox .body").html('<iframe src="'+helpURL+'" style="width:'+size[0]+';height:'+size[1]+';border:none">Loading...</iframe>');
+					var dim = [$(window).width(), $(window).height()];
+					if (dim[0] > dim[1]) {
+						dim[1] *= 0.8;
+						dim[0] = dim[1] * 16 / 9;
+					} else {
+						dim[0] *= 0.9;
+						dim[1] = dim[0] * 9 / 16;
+					} $(".lightbox .body > iframe").animate({width: dim[0].toString()+"px", height: dim[1].toString()+"px"});
+					// app.ui.lightbox.close();
 				break; }
 				default: {
-					const helpWin = window.open($('main > .manual[hidden] a[onClick$="PBL.help(\''+type+'\')"]').attr("data-href"));
+					const helpWin = window.open(helpURL);
 					app.ui.lightbox.close();
 				}
 			}

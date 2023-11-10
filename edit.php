@@ -114,8 +114,8 @@
 		<script type="text/javascript" src="/resource/js/extend/all-PBL.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/fs-teacher.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/fs-account.js"></script>
-		<script type="text/javascript" src="/resource/js/lib/print.min.js"></script>
-		<script type="text/javascript" src="/resource/js/lib/notify.min.js"></script>
+		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/print.min.js"></script>
+		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/notify.min.js"></script>
         <?php } ?>
 	</head>
 	<body>
@@ -162,7 +162,7 @@
                         <i class="fa fa-file-text-o"></i>
                         <span>คู่มือการใช้งานระบบ</span>
                     </a>
-                    <a role="button" class="red" href="javascript:PBL.help('mediaVDO')" data-href="/go?url=">
+                    <a role="button" class="red" href="javascript:PBL.help('mediaVDO')" data-href="/go?url=https%3A%2F%2Fyoutube.com%2Fembed%2F5k48AXEZ9No">
                         <i class="fa fa-youtube-play"></i>
                         <span>วิดีโอแนะนำการใช้งาน</span>
                     </a>

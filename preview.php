@@ -24,14 +24,14 @@
 		"poster"		=> "Poster"
 	); $fileExts = array("png", "jpg", "jpeg", "heic", "heif", "gif", "pdf");
 	// Variables
-	$self = $_SESSION["auth"]["user"] ?? null; $year = $_SESSION["stif"]["t_year"]; # $grade = $_SESSION["auth"]["info"]["grade"]; $room = $_SESSION["auth"]["info"]["room"];
+	$self = $_SESSION["auth"]["user"] ?? null; # $year = $_SESSION["stif"]["t_year"];
+	# $grade = $_SESSION["auth"]["info"]["grade"]; $room = $_SESSION["auth"]["info"]["room"];
 	$code = escapeSQL(trim($_REQUEST["code"] ?? ""));
-	$cond = "year=$year AND code='$code'";
 	$file = escapeSQL($_REQUEST["file"]); $filePos = array_search($file, array_keys($fileCfg));
 	// Execute
 	if (empty($code)) $redirect = "/error/902"; else
 	if (empty($self)) $redirect = "/$my_url"; else {
-		$get = $db -> query("SELECT code,grade,fileStatus,fileType FROM PBL_group WHERE $cond");
+		$get = $db -> query("SELECT year,code,grade,fileStatus,fileType FROM PBL_group WHERE code='$code'");
 		if (!$get) $redirect = "/error/905";
 		else if (!$get -> num_rows)
 			$redirect = "/error/902";
@@ -41,6 +41,7 @@
 			if (intval($read["fileStatus"])&pow(2, $filePos)) {
 				$extension = explode(";", $read["fileType"])[$filePos];
 				$grade = $read["grade"];
+				$year = $read["year"];
 				$path = "resource/upload/PBL/$year/$file/$grade/$code.$extension";
 				$finder = $dirPWroot.$path;
 				$redirect = (file_exists($finder) ? "/resource/file/viewer?furl=".urlencode($path)."&name=$code%20-%20$fileCfg[$file]" : "/error/900");

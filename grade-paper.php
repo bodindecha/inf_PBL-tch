@@ -24,7 +24,7 @@
 				align-self: center;
 				gap: 5px;
 			}
-			main td div.form .group.right { justify-content: flex-end; }
+			main td div.form .group.right { justify-content: flex-end; gap: 0; }
 			main td div.form a[role=button] { min-width: fit-content; }
 			main td div.form select {
 				padding: 0.5px 7.5px;
@@ -112,7 +112,7 @@
 				};
 			}(document)); top.PBL = PBL;
 		</script>
-		<script type="text/javascript" src="/resource/js/lib/w3.min.js"></script>
+		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/w3.min.js"></script>
 	</head>
 	<body>
 		<?php require($dirPWroot."resource/hpe/header.php"); ?>

@@ -80,9 +80,8 @@
 					foreach ($_SESSION["var"]["PBL-message-upload"] as $msg)
 						echo 'app.ui.notify(1, ['.$msg[0].', "'.$msg[1].'"]);';
 					unset($_SESSION["var"]["PBL-message-upload"]);
-				}
+				} if ($upload_success) echo 'top.PBL.save.file("complete");'; else {
 			?>
-			<?php if ($upload_success) echo 'top.PBL.save.file("complete");'; else { ?>
 			const gsef = (function() {
 				if (typeof top.PBL === "undefined") top.PBL = {uploadType: () => "mindmap"};
 				var cv = {

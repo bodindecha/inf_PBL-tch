@@ -228,7 +228,7 @@
 				} else app.ui.notify(1, [1, "Please wait ... You can download again in ("+cooldownload.s+")"]);
 			}
 		</script><?php } ?>
-		<!--script type="text/javascript" src="/resource/js/lib/grade.min.js"></script-->
+		<!--script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/grade.min.js"></script-->
 	</head>
 	<body class="nohbar">
 		<main>

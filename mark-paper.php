@@ -368,7 +368,7 @@
 			}(document)); top.PBL = PBL;
 		</script>
 		<script type="text/javascript" src="/resource/js/extend/all-PBL.js"></script>
-		<script type="text/javascript" src="/resource/js/lib/w3.min.js"></script>
+		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/w3.min.js"></script>
 	</head>
 	<body>
 		<?php require($dirPWroot."resource/hpe/header.php"); ?>

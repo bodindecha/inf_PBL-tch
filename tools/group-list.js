@@ -216,8 +216,10 @@ const PBL = (function(d) {
         });
     },
     projBlock = pi => '<li><div class="accordian" onClick="PBL.expand(this)">'+
-        '<span class="title txtoe">'+pi.title+'</span>'+
-        '</div><div class="extender" data-code="'+pi.code+'" data-loaded="false" style="height: 0;">'+
+        '<div class="title">'+
+            '<span class="title-name txtoe">'+(pi.title == pi.code ? "" : pi.title)+'</span>'+
+            '<span class="title-code">'+pi.code+'</span>'+
+        '</div></div><div class="extender" data-code="'+pi.code+'" data-loaded="false" style="height: 0;">'+
             '<div class="details">'+
                 '<p>สมาชิก <output name="'+pi.code+':class"></output></p>'+
                 '<table class="namelist slider"><tbody name="'+pi.code+':member"></tbody></table>'+
@@ -232,7 +234,7 @@ const PBL = (function(d) {
                     '<button onClick="pUI.viewFile(\''+pi.code+'\')" class="cyan small hollow">View</button>'+
                 '</div-->'+
                 '<!div class="group">'+
-                    '<a role="button" href="/t/PBL/v2/group/'+pi.code+'/browse" class="gray small hollow" target="_blank" draggable="false">View submissions</a>'+
+                    '<a role="button" href="/t/PBL/v2/group/'+pi.code+'/browse" class="purple small hollow" target="_blank" draggable="false">View submissions</a>'+
                     (cv.isModerator ? '<a role="button" href="/t/PBL/v2/group/'+pi.code+'/edit" class="orange small hollow" target="_blank" draggable="false">Overwrite</a>' : '')+
                 '<!/div>'+
             '</div>'+
