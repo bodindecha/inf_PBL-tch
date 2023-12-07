@@ -21,7 +21,7 @@
 			}
 		</style>
 		<script type="text/javascript">
-			// const TRANSLATION = "";
+			const TRANSLATION = location.pathname.substring(1).replace(/\/$/, "").replaceAll("/", "+");
 			$(document).ready(function() {
 				page.init();
 			});
@@ -102,7 +102,7 @@
 					d.querySelector("app[name=main] .add-cmte button.blue").disabled = sv.candidate.length >= 50;
 				},
 				assignUser = function() {
-					if (!confirm("Are you sure you want to entitle user(s) listed below to be " + cv.jobName + " ?")) return;
+					if (!confirm("Are you sure you want to entitle " + sv.candidate.length + " user(s) listed below to be " + cv.jobName + " ?")) return;
 					$("app[name=main] .add-cmte").attr("disabled", "");
 					app.Util.ajax(cv.API_URL, {act: "mod", cmd: "assign", param: {
 						candidate: btoa(sv.candidate.join(", ")),
@@ -144,7 +144,7 @@
 								<button class="blue ripple-click">เพิ่ม</button>
 								<div class="css-flex css-flex-gap-10">
 									<div class="group">
-										<label>โครงงานสาขา</label>
+										<label>สาขาโครงงาน</label>
 										<select name="type" required>
 											<option value disabled selected>— กรุณาเลือก —</option>
 											<?php foreach (str_split("ABCDEFGHIJKLM") as $et) echo '<option value="' . $et . '">' . pblcode2text($et)["th"] . '</option>'; ?>
@@ -153,17 +153,17 @@
 									<button class="purple ripple-click">แต่งตั้ง</button>
 								</div>
 							</div>
-							<fieldset><legend>รายชื่อบัญชี (click to remove)</legend>
+							<fieldset><legend>รายชื่อบัญชี (คลิกเพื่อนำออก)</legend>
 								<div class="candidate css-flex css-flex-inline css-flex-gap-10 css-flex-wrap"></div>
 							</fieldset>
 						</div>
 					</details>
 					<div class="form form-bs inline"><div class="group">
-						<input type="search" name="filter" placeholder="Filter..." />
+						<input type="search" name="filter" placeholder="ค้นหา..." />
 					</div></div>
 					<div class="table responsive"><table>
 						<thead><tr>
-							<th>No.</th><th>Name</th><th>Branch</th><th>Enabled</th><th>Head</th>
+							<th>ลำดับ</th><th>ชื่อ</th><th>สาขา</th><th>เปิดสิทธิ์</th><th>หัวหน้า</th>
 						</tr></thead><tbody class="cmte-list">
 							<tr><td colspan="5"><center class="css-flex"><div class="loading"></div></center></td></tr>
 						</tbody>
