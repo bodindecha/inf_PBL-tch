@@ -49,7 +49,7 @@
         } break;
 		case "project-group": {
             $name = "ข้อมูลย่อกลุ่ม";
-            $result = $db -> query("SELECT a.grade,a.room,a.code,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS nameath,a.type,COALESCE(a.nameth, a.nameen) AS proj_name,a.reward FROM PBL_group a INNER JOIN user_s b ON a.mbr1=b.stdid WHERE a.year=$year AND a.mbr1 IS NOT NULL ORDER BY a.grade,a.room,a.code");
+            $result = $db -> query("SELECT a.grade,a.room,a.code,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS nameath,a.type,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS proj_name,a.reward FROM PBL_group a INNER JOIN user_s b ON a.mbr1=b.stdid WHERE a.year=$year AND a.mbr1 IS NOT NULL ORDER BY a.grade,a.room,a.code");
             $has_result = ($result && $result->num_rows);
             $outputData = "\"ระดับชั้น\"$delimeter\"ห้อง\"$delimeter\"รหัสโครงงาน\"$delimeter\"หัวหน้ากลุ่ม\"$delimeter\"สาขาโครงงาน\"$delimeter\"หัวข้อโครงงาน\"$delimeter\"ระดับรางวัล\"";
             if ($has_result) while ($er = $result->fetch_assoc()) {
@@ -130,7 +130,7 @@
         } break;
 		case "project-score": {
             $name = "คะแนนเฉลี่ยกรรมการ";
-            $result = $db -> query("SELECT a.type,a.grade,a.code,COALESCE(a.nameth, a.nameen) AS proj_name,ROUND(SUM(b.total)/COUNT(b.cmte)) AS total,(CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score, COUNT(b.cmte) AS cmte_amt,GROUP_CONCAT(CONCAT('ครู', d.namefth, ' ', d.namelth)) AS cmte_list FROM PBL_group a INNER JOIN PBL_score b ON a.code=b.code INNER JOIN PBL_cmte c ON b.cmte=c.cmteid AND a.type=c.type AND c.year=$year INNER JOIN user_t d ON c.tchr=d.namecode WHERE a.year=$year GROUP BY a.code ORDER BY type,grade,code");
+            $result = $db -> query("SELECT a.type,a.grade,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS proj_name,ROUND(SUM(b.total)/COUNT(b.cmte)) AS total,(CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score, COUNT(b.cmte) AS cmte_amt,GROUP_CONCAT(CONCAT('ครู', d.namefth, ' ', d.namelth)) AS cmte_list FROM PBL_group a INNER JOIN PBL_score b ON a.code=b.code INNER JOIN PBL_cmte c ON b.cmte=c.cmteid AND a.type=c.type AND c.year=$year INNER JOIN user_t d ON c.tchr=d.namecode WHERE a.year=$year GROUP BY a.code ORDER BY type,grade,code");
             $has_result = ($result && $result->num_rows);
             $outputData = "\"สาขาโครงงาน\"$delimeter\"ระดับชั้น\"$delimeter\"รหัสโครงงาน\"$delimeter\"หัวข้อโครงงาน\"$delimeter\"คะแนนเฉลี่ย\"$delimeter\"คิดเป็น\"$delimeter\"จำนวนกรรมการ\"$delimeter\"รายชื่อกรรมการ\"";
             if ($has_result) while ($er = $result->fetch_assoc()) {
@@ -142,7 +142,7 @@
         } break;
 		case "project-result": {
             $name = "ผลและคะแนนเล่มรายงาน";
-            $result = $db -> query("SELECT a.grade,a.room,a.code,COALESCE(a.nameth, a.nameen) AS name,a.type,(CASE WHEN a.reward='5N' THEN 'ไม่ผ่าน' WHEN a.reward IS NULL THEN '-' ELSE 'ผ่าน' END) AS evalG,COALESCE(ROUND(SUM(b.total)/COUNT(b.cmte)), '') AS evalM,COALESCE((CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte)) IS NULL THEN NULL WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END), '') AS score FROM PBL_group a LEFT JOIN PBL_score b ON a.code=b.code WHERE a.year=$year AND a.mbr1 IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.room,a.code");
+            $result = $db -> query("SELECT a.grade,a.room,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.type,(CASE WHEN a.reward='5N' THEN 'ไม่ผ่าน' WHEN a.reward IS NULL THEN '-' ELSE 'ผ่าน' END) AS evalG,COALESCE(ROUND(SUM(b.total)/COUNT(b.cmte)), '') AS evalM,COALESCE((CASE WHEN ROUND(SUM(b.total)/COUNT(b.cmte)) IS NULL THEN NULL WHEN ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END), '') AS score FROM PBL_group a LEFT JOIN PBL_score b ON a.code=b.code WHERE a.year=$year AND a.mbr1 IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.room,a.code");
             $has_result = ($result && $result->num_rows);
             $outputData = "\"ระดับชั้น\"$delimeter\"ห้อง\"$delimeter\"รหัสโครงงาน\"$delimeter\"หัวข้อโครงงาน\"$delimeter\"สาขาโครงงาน\"$delimeter\"ผลประเมิน\"$delimeter\"คะแนนเฉลี่ย\"$delimeter\"คิดเป็น\"";
             if ($has_result) while ($er = $result->fetch_assoc()) {

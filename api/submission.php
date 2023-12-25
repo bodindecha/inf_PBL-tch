@@ -43,7 +43,7 @@
 							if (file_exists($finder)) {
 								$get_submit = $db -> query("SELECT LEFT(time, 19) AS time FROM log_action WHERE app='PBL' AND cmd='new' AND act='file' AND 
 								data='$code: $file' AND val='pass' ORDER BY time DESC,logid DESC LIMIT 1");
-								$submit_time = ($get_submit && $get_submit -> num_rows) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:iน.", strtotime(($get_submit -> fetch_array(MYSQLI_ASSOC))["time"])) : "ยังไม่ส่งไฟล์";
+								$submit_time = ($get_submit && $get_submit -> num_rows) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:i น.", strtotime(($get_submit -> fetch_array(MYSQLI_ASSOC))["time"])) : "ยังไม่ส่งไฟล์";
 								successState(array(
 									"link" => "/resource/file/viewer?furl=".urlencode($path)."&name=$code%20-%20$file",
 									"date" => $submit_time
@@ -68,10 +68,10 @@
 				} break;
 				case "mark": {
 					$code = escapeSQL($attr);
-					$checkMaster = $isPBLmaster ? "" : "AND b.allow='Y' AND b.type=a.type";
-					$get_score = $db -> query("SELECT a.type,c.raw AS score,c.note FROM PBL_group a INNER JOIN PBL_cmte b ON b.year=$year AND b.tchr='$self' $checkMaster LEFT JOIN PBL_score c ON c.code=a.code AND c.cmte=b.cmteid WHERE a.code='$code'");
+					$checkMaster = $isPBLmaster ? "" : "AND b.allow='Y'";
+					$get_score = $db -> query("SELECT a.type,c.raw AS score,c.note FROM PBL_group a INNER JOIN PBL_cmte b ON b.year=$year AND b.tchr='$self' $checkMaster  AND b.type=a.type LEFT JOIN PBL_score c ON c.code=a.code AND c.cmte=b.cmteid WHERE a.code='$code'");
 					$get_submit = $db -> query("SELECT LEFT(time, 19) AS time FROM log_action WHERE app='PBL' AND cmd='new' AND act='file' AND data='$code: report-all' AND val='pass' ORDER BY time DESC LIMIT 1");
-					$submit_time = ($get_submit && $get_submit -> num_rows) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:iน.", strtotime(($get_submit -> fetch_array(MYSQLI_ASSOC))["time"])) : "";
+					$submit_time = ($get_submit && $get_submit -> num_rows) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:i น.", strtotime(($get_submit -> fetch_array(MYSQLI_ASSOC))["time"])) : "";
 					if (!$get_score) errorMessage(3, "Unable to load scores");
 					else if ($get_score -> num_rows <> 1) errorMessage(3, "Unable to get scores");
 					else {
@@ -79,6 +79,17 @@
 						$read_score["note"] = str_replace("&quot;", "\"", $read_score["note"]);
 						$read_score["submit"] = $submit_time;
 						successState($read_score);
+					}
+				} break;
+				case "subTime": {
+					$code = escapeSQL($attr);
+					$get = $db -> query("SELECT LEFT(time, 19) AS time FROM log_action WHERE app='PBL' AND cmd='new' AND act='file' AND data='$code: report-all' AND val='pass' ORDER BY time DESC LIMIT 1");
+					if (!$get) errorMessage(3, "Unable to load submission time");
+					else if ($get -> num_rows <> 1) errorMessage(3, "Unable to get submission time"); 
+					else {
+						$time = ($get -> fetch_array(MYSQLI_ASSOC))["time"];
+						$time = !empty($time) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:i น.", strtotime($time)) : "";
+						successState($time);
 					}
 				} break;
 				default: errorMessage(1, "Invalid command"); break;

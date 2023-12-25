@@ -159,6 +159,7 @@
 						</div>
 					</details>
 					<div class="form form-bs inline"><div class="group">
+						<label><i class="material-icons">filter_list</i></label>
 						<input type="search" name="filter" placeholder="ค้นหา..." />
 					</div></div>
 					<div class="table responsive"><table>

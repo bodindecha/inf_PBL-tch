@@ -10,6 +10,7 @@
 	<head>
 		<?php require($dirPWroot."resource/hpe/heading.php"); require($dirPWroot."resource/hpe/init_ss.php"); ?>
 		<style type="text/css">
+			main > .container.widescreen { width: 100%; }
 			main .wrapper {
 				--pages: 3;
 				width: 100%;
@@ -25,10 +26,13 @@
 			main .wrapper .page {
 				margin-right: 2rem;
 				width: 100%; max-width: var(--mw); height: fit-content;
+				transition: var(--time-tst-fast) ease;
 			}
 			main .wrapper .page > *:not(:last-child) { margin: 0px 0px 10px; }
 			main .page-1 td:nth-child(1) { font-family: "pixelmix", monospace; font-weight: 100; font-size: 0.8em; }
 			main .page-1 .form button { min-width: fit-content; }
+			main .page-1 td:nth-child(4) ol { margin: 0; padding-left: 30px; }
+			main .page-1 td:nth-child(4) ol li { white-space: nowrap; }
 			main .mform {
 				--page-h: calc(100vh - var(--top-height) - 50px - 47px);
 				margin-bottom: 10px;
@@ -203,7 +207,10 @@
 			})
 			const PBL = (function(d) {
 				const cv = { API_URL: "/t/PBL/v2/api/" };
-				var sv = { started: false, scrolled: null, chatInit: false };
+				var sv = {
+					started: false, scrolled: null, chatInit: false,
+					dataLoading: []
+				};
 				var initialize = function() {
 					if (!sv.started) {
 						getList();
@@ -219,21 +226,35 @@
 							var ctn = $("main div.container .wrapper .page-1");
 							Object.keys(dat).forEach(ec => {
 								ctn.append("<h3 class=\"center\">"+ec+"</h3>");
-								var table = '<div class="table wrap"><table><thead><tr><th>รหัสโครงงาน</th><th>ชื่อโครงงาน</th><th>ผลประเมิน</th></tr></thead><tbody>';
+								var table = '<div class="table wrap"><table><thead><tr><th>รหัสโครงงาน</th><th>ชื่อโครงงาน</th><th>ผลประเมิน</th><th>จำนวนกรรมการ<br>ที่ตรวจแล้ว</th></tr></thead><tbody>';
 								Object.keys(dat[ec]).sort().forEach(eg => {
-									table += '<tr data-head><th colspan="3">มัธยมศึกษาปีที่ '+eg+'</th></tr>';
+									table += '<tr data-head><th colspan="4">มัธยมศึกษาปีที่ '+eg+'</th></tr>';
 									dat[ec][eg].forEach(ep => {
-										table += '<tr><td class="center select-all">'+ep["code"]+'</td><td>'+ep["name"]+'</td><td><div class="form center action-'+ep["code"]+'">'+(ep["mark"]?'<div class="group pill"><button class="green small no-action" disabled>ประเมินแล้ว</button><button class="yellow small" onClick="PBL.startView(\''+ep["code"]+'\')" data-title="แก้ไข"><i class="material-icons">edit</i></button></div>':'<button class="blue small" onClick="PBL.startView(\''+ep["code"]+'\')">ตรวจ</button>')+'</div></td></tr>';
+										table += '<tr><td class="center select-all">'+ep["code"]+'</td><td>'+ep["name"]+'</td><td><div class="form center action-'+ep["code"]+'">'+(ep["mark"]?'<div class="group pill"><button class="green small no-action" disabled>ประเมินแล้ว</button><button class="yellow small" onClick="PBL.startView(\''+ep["code"]+'\')" data-title="แก้ไข"><i class="material-icons">edit</i></button></div>':'<button class="blue small" onClick="PBL.startView(\''+ep["code"]+'\')">ตรวจ</button>')+'</div></td><td><center><a '+(ep["aogc"]!="0"?'onClick="PBL.getGradedCommitteeNames(\''+ep["code"]+'\', this)" href="javascript:"':"")+'>'+ep["aogc"]+(ep["aogc"]!="0"?' ท่าน':"")+'</a></center></td></tr>';
 									});
 								}); ctn.append(table+'</tbody></table></div>');
 							});
-							$("main .oform").toggle("blind");
+							$("main .oform, main .minWarn").toggle("blind");
 							$('main select[name^="pr:"]').on("change", function() {
 								var code = this.getAttribute("name").split(":")[1];
 								$('main button[onClick^="PBL.saveGrade(\''+code+'\'"]').removeAttr("disabled");
 							});
 							$("main .wrapper > div").css("height", $("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height().toString()+"px");
 						} $("main .loading").remove();
+					});
+				},
+				getGradedCommitteeNames = function(code, me) {
+					var me = $(me).attr("disabled", "");
+					if (sv.dataLoading.includes(code)) return;
+					sv.dataLoading.push(code);
+					ajax(cv.API_URL+"evaluation", {type: "list", act: "graded-committee", param: code}).then(function(dat) {
+						if (!dat) return setTimeout(function() {
+							me.removeAttr("disabled");
+							sv.dataLoading.splice(sv.dataLoading.indexOf(code), 1);
+						}, 750);
+						var list = $(`<ol></ol>`);
+						dat.forEach(ec => list.append(`<li>${ec}</li>`));
+						me.parent().replaceWith(list);
 					});
 				},
 				toPage = function(pageNo) {
@@ -249,13 +270,16 @@
 								$("main .wrapper > div").animate({ height: height[1] }, wait);
 								sv.scrolled = null; sv.chatInit = false;
 							} $('main output[name="time"]').val("").hide();
+							$('main > .container').removeClass("widescreen");
 						break; }
 						case 2: {
 							sv.scrolled = $(d).scrollTop();
 							$("html, body").animate({ scrollTop: 0 });
 							$("main .wrapper > div").animate({ height: height[1] }, wait);
+							$('main > .container').addClass("widescreen");
 						break; }
 					} $("main .wrapper > div").css("--page", parseInt(pageNo));
+					$(window).trigger("resize");
 				},
 				openFile = async function(code) {
 					d.querySelector('main iframe[name="viewer"]').src = "/t/PBL/v2/preview?file=report-all&code="+code;
@@ -363,7 +387,8 @@
 					saveGrade: record,
 					filterByText: search,
 					selection: backToList,
-					addComment: goToChat
+					addComment: goToChat,
+					getGradedCommitteeNames
 				};
 			}(document)); top.PBL = PBL;
 		</script>
@@ -387,6 +412,7 @@
 									<input type="search" name="find" placeholder="Find..." onInput="PBL.filterByText()">
 								</div>
 							</form>
+							<center class="minWarn message cyan" style="display: none;">โครงงานแต่ละเล่ม ควรได้รับการพิจารณาคะแนนจากกรรมการอย่างน้อย 3 ท่าน</center>
 						</div>
 						<div class="page page-2">
 							<form class="mform">

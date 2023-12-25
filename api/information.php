@@ -19,7 +19,7 @@
 				$read = $get -> fetch_array(MYSQLI_ASSOC);
 				successState(array(
 					"class" => "ม.".$read["grade"]."/".$read["room"],
-					"update" => date("วันที่ d/m/Y เวลา H:iน.", strtotime($read["lastupdate"])),
+					"update" => date("วันที่ d/m/Y เวลา H:i น.", strtotime($read["lastupdate"])),
 					"type" => pblcode2text($read["type"])[$_COOKIE["set_lang"]],
 					"member" => array_values(array_filter(array($read["mbr1"], $read["mbr2"], $read["mbr3"], $read["mbr4"], $read["mbr5"], $read["mbr6"], $read["mbr7"]))),
 					"advisor" => array_filter(array($read["adv1"], $read["adv2"], $read["adv3"])),
