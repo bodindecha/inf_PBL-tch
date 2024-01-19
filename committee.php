@@ -27,7 +27,7 @@
 			});
 			const page = (function(d) {
 				const cv = {
-					API_URL: AppConfig.baseURL + "t/PBL/v2/api/committee",
+					API_URL: AppConfig.APIbase + "PBL/v1-teacher/committee",
 					jobName: "คณะกรรมการตรวจโครงงาน"
 				};
 				var sv = {inited: false, record: [], candidate: []};
@@ -49,8 +49,8 @@
 							buffer += '<tr><td>' + (holder++).toString() + '</td>' +
 								'<td>' + es.name + '</td>' +
 								'<td>' + es.branch + '</td>' +
-								'<td><div class="css-flex center"><input type="checkbox" name="s:' + es.impact + '" class="switch" onChange="page.updateStatus(this)" ' + (es.active ? "checked" : "") + ' /></div></td>' +
-								'<td><div class="css-flex center"><input type="checkbox" name="h:' + es.impact + '" class="switch" onChange="page.updateStatus(this)" ' + (es.chief ? "checked" : "") + ' /></div></td>' +
+								'<td><div class="css-flex center"><input type="checkbox" name="s:' + es.impact + '" class="switch off-red" onChange="page.updateStatus(this)" ' + (es.active ? "checked" : "") + ' /></div></td>' +
+								'<td><div class="css-flex center"><input type="checkbox" name="h:' + es.impact + '" class="switch on-purple" onChange="page.updateStatus(this)" ' + (es.chief ? "checked" : "") + ' /></div></td>' +
 							'</tr>';
 							sv.record[es.impact] = {allow: es.active, isHead: es.chief};
 						}); $("app[name=main] .cmte-list").html(buffer);
@@ -81,7 +81,7 @@
 				},
 				appendUser = function(ID, display) {
 					if (typeof ID === "undefined") return;
-					var nameTag = $('<button name="c:' + ID + '" class="black small hollow pill" onClick="page.removeCandidate(this)" style="display: none;">' + display + '</button>')
+					var nameTag = $('<button name="c:' + ID + '" class="black small hollow pill css-overflow-hidden" onClick="page.removeCandidate(this)" style="display: none;">' + display + '</button>')
 					$("app[name=main] .candidate").append(nameTag);
 					setTimeout(() => nameTag.toggle("clip"), 250);
 					sv.candidate.push(ID);
@@ -92,7 +92,7 @@
 					sv.candidate.splice(sv.candidate.indexOf(reference), 1);
 					me = $(me);
 					me.css("width", me.outerWidth() - 2)
-						.animate({width: 0, padding: 0, borderWidth: 0}, 5e2, "linear", function() {
+						.animate({width: 0, padding: 0, borderWidth: 0, marginLeft: -10}, 5e2, "linear", function() {
 							setTimeout(() => me.remove(), 1e2);
 						});
 					addButtonState();
@@ -162,7 +162,7 @@
 						<label><i class="material-icons">filter_list</i></label>
 						<input type="search" name="filter" placeholder="ค้นหา..." />
 					</div></div>
-					<div class="table responsive"><table>
+					<div class="table static responsive striped"><table>
 						<thead><tr>
 							<th>ลำดับ</th><th>ชื่อ</th><th>สาขา</th><th>เปิดสิทธิ์</th><th>หัวหน้า</th>
 						</tr></thead><tbody class="cmte-list">

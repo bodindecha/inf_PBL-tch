@@ -83,13 +83,16 @@
 				} break;
 				case "subTime": {
 					$code = escapeSQL($attr);
-					$get = $db -> query("SELECT LEFT(time, 19) AS time FROM log_action WHERE app='PBL' AND cmd='new' AND act='file' AND data='$code: report-all' AND val='pass' ORDER BY time DESC LIMIT 1");
+					$get = $db -> query("SELECT LEFT(a.time, 19) AS time,CAST(a.time AS DATE) > c.value AS isLate FROM log_action a JOIN config_sys b ON b.name='t_year' INNER JOIN config_sep c ON c.year=b.value AND c.name='PBL-dd_F' WHERE a.app='PBL' AND a.cmd='new' AND a.act='file' AND a.data='$code: report-all' AND a.val='pass' ORDER BY a.time DESC LIMIT 1");
 					if (!$get) errorMessage(3, "Unable to load submission time");
 					else if ($get -> num_rows <> 1) errorMessage(3, "Unable to get submission time"); 
 					else {
-						$time = ($get -> fetch_array(MYSQLI_ASSOC))["time"];
-						$time = !empty($time) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:i น.", strtotime($time)) : "";
-						successState($time);
+						$read = $get -> fetch_array(MYSQLI_ASSOC);
+						$read["time"] = !empty($read["time"]) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:i น.", strtotime($read["time"])) : "";
+						successState(array(
+							"timestamp" => $read["time"],
+							"isLate" => boolval($read["isLate"])
+						));
 					}
 				} break;
 				default: errorMessage(1, "Invalid command"); break;

@@ -412,14 +412,18 @@ const PBL = (function(d) {
 			if (typeof dat.isGrouped !== "undefined" && !dat.isGrouped) initialRender([null, null, 0]); else {
 				if (dat.score) {
 					$('main .page[path="information"] .score').fadeIn();
-					$('main .page[path="information"] [name="net"]')
-						.text(dat.score)
+					$('main .page[path="information"] .score [name="net"]')
+						.val(dat.score)
 						.attr("class", "color-"+(" rrrog"[dat.score]));
+					$('main .page[path="information"] .score [name="ppr"]').val(dat.score_paper != null ? dat.score_paper+" " : "ไม่มี");
+					$('main .page[path="information"] .score [name="pst"]').val(dat.score_poster != null ? dat.score_poster+" " : "ไม่มี");
+					$('main .page[path="information"] .score [name="act"]').val(dat.score_activity != null ? dat.score_activity+" " : "ไม่มี");
 				} else {
 					$('main .page[path="information"] .score').fadeOut();
-					$('main .page[path="information"] [name="net"]')
-						.text("").removeAttr("class");
-				} delete dat.score;
+					$('main .page[path="information"] .score [name="net"]')
+						.val("").removeAttr("class");
+					$('main .page[path="information"] .score:where([name="ppr"], [name="pst"], [name="act"])').val("");
+				} ["score", "score_paper", "score_poster", "score_activity"].forEach(es => delete dat[es]);
 				Object.keys(dat).forEach(ei => $('main .page[path="information"] [name="'+ei+'"]').val(dat[ei] || "") );
 				sv.state["loadInfoOver"] = true; checkUnsavedPage(sv.current["page"]);
 				var advs = [dat["adv1"], dat["adv2"], dat["adv3"]].filter(ea => ea != null);

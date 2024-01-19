@@ -112,9 +112,14 @@ require_once($dirPWroot . "resource/php/core/config.php");
 				</div>
 			</form>
 		</div>
-		<div class="message cyan score" style="display: none;">
-			<span>ผลการประเมิน: <output name="net"></output> คะแนน</span>
-		</div>
+		<details class="message cyan score" style="display: none;">
+			<summary>ผลการประเมิน: <output name="net"></output> คะแนน</summary>
+			<ul>
+				<li>เล่มรายงาน <output name="ppr"></output>คะแนน (เต็ม 3)</li>
+				<li>โปสเตอร์ <output name="pst"></output>คะแนน (เต็ม 1)</li>
+				<li>เข้าร่วมกิจกรรม <output name="act"></output>คะแนน (เต็ม 1)</li>
+			</ul>
+		</details>
 	</div>
 	<div class="page" path="member">
 		<div class="code">

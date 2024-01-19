@@ -179,6 +179,7 @@
 						<select name="type">
 							<option value=" "><?=($_COOKIE["set_lang"]=="th"?"ทั้งหมด":"All")?></option>
 							<?php foreach (str_split("ABCDEFGHIJKLM") as $et) echo '<option value="'.$et.'">'.pblcode2text($et)[$_COOKIE["set_lang"]].'</option>'; ?>
+							<option value=""><?=($_COOKIE["set_lang"]=="th"?"ยังไม่ได้เลือก":"Not chosen")?></option>
 						</select>
 					</div>
 					<div class="group">

@@ -5,7 +5,7 @@
 	$header_desc = "ขั้นที่ 1: ผ่าน/ไม่ผ่าน";
 	$home_menu = "is-pbl";
 
-	$timesUp = strtotime("2024-01-07 23:59:59");
+	$timesUp = strtotime("2024-01-08 23:59:59");
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -84,30 +84,32 @@
 								ctn.find("a[role=button]["+cv.controlField+"]").on("mouseover touchstart", loadSubTime);
 							});
 							$("main .oform").toggle("blind");
-							$("main .message.timeWarn").toggle("blind");
 							$('main select[name^="pr:"]').on("change", function() {
 								var code = this.getAttribute("name").split(":")[1];
 								$('main button[onClick^="PBL.saveGrade(\''+code+'\'"]').removeAttr("disabled");
 							})
 						} $("main .loading").remove();
+						$("main .message.timeWarn").toggle("blind");
 					});
 				},
 				loadSubTime = function(event) {
-					if (!event.ctrlKey && event.preventDefault) event.preventDefault()
-					var me = $(event.target).off("mouseover touchstart");
+					if (event.type == "click" && !event.ctrlKey && event.preventDefault) event.preventDefault();
+					var me = $(event.target).off("mouseover touchstart").addClass("disabled");
 					var code = me.attr(cv.controlField);
 					if (sv.dataLoading.includes(code)) return;
 					sv.dataLoading.push(code);
 					ajax(cv.API_URL+"submission", {type: "load", act: "subTime", param: code}).then(function(dat) {
-						if (dat) me.off("mouseover touchstart")
-							.removeAttr(cv.controlField)
-							.attr("onClick", "PBL.viewfile('"+code+"', '"+dat+"', event)")
-							.attr("data-title", dat);
-						else setTimeout(function() {
+						me.removeClass("disabled");
+						if (dat) {
+							me.removeAttr(cv.controlField)
+								.attr("onClick", "PBL.viewfile('"+code+"', '"+dat.timestamp+"', event)")
+								.attr("data-title", dat.timestamp);
+							if (dat.isLate) me.toggleClass("cyan yellow");
+						} else setTimeout(function() {
 							me.on("mouseover touchstart", loadSubTime);
 							sv.dataLoading.splice(sv.dataLoading.indexOf(code), 1);
 						}, 750);
-						if (!event.ctrlKey) me.click();
+						if (event.type == "click" && !event.ctrlKey) me.click();
 					});
 				},
 				openFile = function(code, time, e) {
@@ -126,7 +128,8 @@
 						update.next().attr("disabled", "");
 						ajax(cv.API_URL+"submission", {type: "save", act: "rank", param: {code: code, rank: update.val()}}).then(function(dat) {
 							if (dat) {
-								update.next().attr("disabled", "");
+								update.next().attr("disabled", "")
+									.off("click").attr("onClick", `PBL.saveGrade('${code}', '${update.val()}')`);
 								app.ui.notify(1, [0, "บันทึกผลโครงงาน "+code+" สำเร็จ"]);
 							} else update.next().removeAttr("disabled");
 						});

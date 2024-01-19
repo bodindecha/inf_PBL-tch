@@ -84,7 +84,7 @@
 							["การทำงานตามกระบวนการออกแบบเชิงวิศวกรรมอย่างครบถ้วน", 3],
 							["มีการทำงานตามกระบวนการออกแบบเชิงวิศวกรรมแต่ละขั้นได้อย่างถูกต้องและมีคุณภาพ", 4]
 						]},
-						{title: "การบูรณาการ S (วิทยาศาสตร์)  M (คณิตศาสตร์)  T (เทคโนโลยี)", sub: [
+						{title: "การบูรณาการ S (วิทยาศาสตร์) M (คณิตศาสตร์) T (เทคโนโลยี)", sub: [
 							["มีการบูรณาการความรู้ด้านสะเต็มศึกษาที่เกี่ยวข้องกับการแก้ปัญหาได้อย่างครบถ้วน", 4],
 							["การอธิบายความรู้ด้านสะเต็มศึกษาที่เกี่ยวข้องและเชื่อมโยงกับการแก้ปัญหาได้อย่างถูกต้อง ชัดเจน", 4]
 						]},
@@ -220,27 +220,37 @@
 						sv.started = true;
 					}
 				},
+				checkPage = function() {
+					if (!/^book=[A-Z0-9]{6}$/.test(location.hash.substring(1))) return;
+					var book = location.hash.substring(6);
+					openFile(book);
+					setTimeout(function() {
+						sv.scrolled = $("main .action-"+book).offset().top - $(window).height() / 2;
+					}, 250);
+				},
 				getList = function() {
 					ajax(cv.API_URL+"evaluation", {type: "list", act: "paper-mark"}).then(function(dat) {
-						if (dat) {
-							var ctn = $("main div.container .wrapper .page-1");
-							Object.keys(dat).forEach(ec => {
-								ctn.append("<h3 class=\"center\">"+ec+"</h3>");
-								var table = '<div class="table wrap"><table><thead><tr><th>รหัสโครงงาน</th><th>ชื่อโครงงาน</th><th>ผลประเมิน</th><th>จำนวนกรรมการ<br>ที่ตรวจแล้ว</th></tr></thead><tbody>';
-								Object.keys(dat[ec]).sort().forEach(eg => {
-									table += '<tr data-head><th colspan="4">มัธยมศึกษาปีที่ '+eg+'</th></tr>';
-									dat[ec][eg].forEach(ep => {
-										table += '<tr><td class="center select-all">'+ep["code"]+'</td><td>'+ep["name"]+'</td><td><div class="form center action-'+ep["code"]+'">'+(ep["mark"]?'<div class="group pill"><button class="green small no-action" disabled>ประเมินแล้ว</button><button class="yellow small" onClick="PBL.startView(\''+ep["code"]+'\')" data-title="แก้ไข"><i class="material-icons">edit</i></button></div>':'<button class="blue small" onClick="PBL.startView(\''+ep["code"]+'\')">ตรวจ</button>')+'</div></td><td><center><a '+(ep["aogc"]!="0"?'onClick="PBL.getGradedCommitteeNames(\''+ep["code"]+'\', this)" href="javascript:"':"")+'>'+ep["aogc"]+(ep["aogc"]!="0"?' ท่าน':"")+'</a></center></td></tr>';
-									});
-								}); ctn.append(table+'</tbody></table></div>');
-							});
-							$("main .oform, main .minWarn").toggle("blind");
-							$('main select[name^="pr:"]').on("change", function() {
-								var code = this.getAttribute("name").split(":")[1];
-								$('main button[onClick^="PBL.saveGrade(\''+code+'\'"]').removeAttr("disabled");
-							});
-							$("main .wrapper > div").css("height", $("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height().toString()+"px");
-						} $("main .loading").remove();
+						$("main .loading").remove();
+						$("main .message.timeWarn").toggle("blind");
+						if (!dat) return;
+						var ctn = $("main div.container .wrapper .page-1");
+						Object.keys(dat).forEach(ec => {
+							ctn.append("<h3 class=\"center\">"+ec+"</h3>");
+							var table = '<div class="table wrap"><table><thead><tr><th>รหัสโครงงาน</th><th>ชื่อโครงงาน</th><th>ผลประเมิน</th><th>จำนวนกรรมการ<br>ที่ตรวจแล้ว</th></tr></thead><tbody>';
+							Object.keys(dat[ec]).sort().forEach(eg => {
+								table += '<tr data-head><th colspan="4">มัธยมศึกษาปีที่ '+eg+'</th></tr>';
+								dat[ec][eg].forEach(ep => {
+									table += '<tr><td class="center select-all">'+ep["code"]+'</td><td>'+ep["name"]+'</td><td><div class="form center action-'+ep["code"]+'">'+(ep["mark"]?'<div class="group pill"><button class="green small no-action" disabled>ประเมินแล้ว</button><button class="yellow small" onClick="PBL.startView(\''+ep["code"]+'\')" data-title="แก้ไข"><i class="material-icons">edit</i></button></div>':'<button class="blue small" onClick="PBL.startView(\''+ep["code"]+'\')">ตรวจ</button>')+'</div></td><td><center><a '+(ep["aogc"]!="0"?'onClick="PBL.getGradedCommitteeNames(\''+ep["code"]+'\', this)" href="javascript:" draggable="false"':'style="color: var(--clr-bs-red);"')+'>'+(ep["aogc"]!="0"?ep["aogc"]+' ท่าน':"ไม่มี")+'</a></center></td></tr>';
+								});
+							}); ctn.append(table+'</tbody></table></div>');
+						});
+						$("main .oform, main .message:where(.minWarn, .features)").toggle("blind");
+						$('main select[name^="pr:"]').on("change", function() {
+							var code = this.getAttribute("name").split(":")[1];
+							$('main button[onClick^="PBL.saveGrade(\''+code+'\'"]').removeAttr("disabled");
+						}); setTimeout(function() { $(window).trigger("resize"); }, 750);
+						$("main .wrapper > div").css("height", $("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height().toString()+"px");
+						checkPage();
 					});
 				},
 				getGradedCommitteeNames = function(code, me) {
@@ -255,13 +265,19 @@
 						var list = $(`<ol></ol>`);
 						dat.forEach(ec => list.append(`<li>${ec}</li>`));
 						me.parent().replaceWith(list);
+						// Readjust view
+						var height = [
+							$("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height(),
+							$("main .wrapper .page-1").height()
+						]; $("main .wrapper > div").animate({ height: height[1] });
+						$(window).trigger("resize");
 					});
 				},
 				toPage = function(pageNo) {
 					var height = [
 						$("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height(),
 						$("main .wrapper .page-"+pageNo.toString()).height()
-					], wait = 0; if (height[0] > height[1]) wait = 1000;
+					], wait = height[0] > height[1] ? 1e3 : 0;
 					switch (pageNo) {
 						case 1: {
 							d.querySelector('main iframe[name="viewer"]').src = "";
@@ -314,7 +330,8 @@
 					else app.ui.notify(1, [1, "คะแนนเต็ม "+form.perMax.toString()+" คะแนน<br><ol style=\"margin: 0; padding: 0 0 0 20px;\"><li>พอใช้</li><li>ดี</li><li>ดีมาก</li><li>ดีเยี่ยม</li></ol>"]);
 					/* --- Temporary --- */
 					form.questions.forEach(eg => {
-						render += '<tr><th>'+(form.noIndex ? (++noIndex[1]).toString() : "")+'</th><th align="left">'+eg.title+'</th><th></th></tr>';
+						// render += '<tr><th>'+(form.noIndex ? (++noIndex[1]).toString() : "")+'</th><th align="left">'+eg.title+'</th><th></th></tr>';
+						render += '<tr>'+(form.noIndex ? '<th colspan="2" align="left" data-chapter="'+(++noIndex[1]).toString()+'">' : '<th></th><th align="left">')+eg.title+'</th><th></th></tr>';
 						noIndex[2] = 0;
 						eg.sub.forEach(eq => {
 							render += '<tr><td class="center">'+(form.noIndex ? noIndex[1].toString()+"."+(++noIndex[2]).toString() : (++noIndex[1]).toString())+'</td><td>'+eq[0]+'</td><td><input type="number" name="c'+(++noIndex[0]).toString()+'" min="1" max="'+form.perMax.toString()+'" step="1" maxlength="1" data-weight="'+eq[1]+'"></td></tr>';
@@ -362,7 +379,13 @@
 				},
 				search = function() {
 					var query = $('main .oform input[name="find"]').val().trim();
-					w3.filterHTML("main .table tbody", "tr:not([data-head]", query);
+					w3.filterHTML("main .table tbody", "tr:not([data-head])", query);
+					// Readjust view
+					var height = [
+						$("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height(),
+						$("main .wrapper .page-1").height()
+					]; $("main .wrapper > div").height(height[1]);
+					$(window).trigger("resize");
 				},
 				backToList = function() {
 					(function() {
@@ -406,6 +429,15 @@
 				<div class="wrapper">
 					<div style="--page:1;">
 						<div class="page page-1">
+							<center class="features message blue" style="display: none;">
+								<div class="center" style="display: flex; gap: 10px;">
+									<i class="material-icons">info</i>
+									<span>เฉพาะข้อความที่พิมพ์ส่งในส่วน "สนทนากับนักเรียน" ที่จะแสดงให้นักเรียนเห็น<br><u>บันทึกช่วยจำจะไม่แสดงกับนักเรียน</u>หรือผู้อื่นนอกจากคุณ</span>
+								</div>
+								<hr>
+								<div class="form inline center">ใช้ปุ่ม <button class="yellow icon" disabled=""><i class="material-icons" style="transform: rotate(180deg);">logout</i></button> เพื่อกลับจากหน้าประเมินคะแนนสู่หน้าตารางโครงงาน</div>
+							</center>
+							<center class="timeWarn message yellow" style="display: none;">หลังวันที่ 18 มกราคม 2567 เวลา 13.30 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
 							<form class="form oform" onSubmit="return false;" style="display: none;" onSubmit="return false;">
 								<div class="group">
 									<span><i class="material-icons">search</i></span>
