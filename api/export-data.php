@@ -37,7 +37,7 @@
 		} break;
 		case "project-title": {
 			$name = "รายชื่อโครงงาน";
-			$result = $db -> query("SELECT grade,room,code,(CASE a.nameth WHEN '' THEN (CASE a.nameen WHEN '' THEN '~ไม่มีชื่อโครงงาน~' ELSE '' END) ELSE a.nameth END) AS name,type FROM PBL_group WHERE year=$year AND mbr1 IS NOT NULL ORDER BY grade,room,name");
+			$result = $db -> query("SELECT grade,room,code,(CASE nameth WHEN '' THEN (CASE nameen WHEN '' THEN '~ไม่มีชื่อโครงงาน~' ELSE '' END) ELSE nameth END) AS name,type FROM PBL_group WHERE year=$year AND mbr1 IS NOT NULL ORDER BY grade,room,name");
 			$has_result = ($result && $result->num_rows);
 			$outputData = "\"ระดับชั้น\"$delimeter\"ห้อง\"$delimeter\"รหัสโครงงาน\"$delimeter\"หัวข้อโครงงาน\"$delimeter\"สาขาโครงงาน\"";
 			if ($has_result) while ($er = $result->fetch_assoc()) {

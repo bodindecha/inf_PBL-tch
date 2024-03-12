@@ -99,7 +99,7 @@
 						</tr>
 					</thead><tbody class="responsive"></tbody></table></div>
 					<div class="step-2 css-flex center" style="display: none;">
-						<button class="yellow large pill icon ripple-click" onClick="page.process()">
+						<button class="yellow large pill icon wide ripple-click" onClick="page.process()">
 							<i class="material-icons">warning</i>
 							<span class="text">Confirm process!</span>
 						</button>

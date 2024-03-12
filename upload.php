@@ -90,40 +90,40 @@
 					fileDetail: {
 						"mindmap": {
 							name: "แผนผังความคิดบูรณาการ 8 กลุ่มสาระการเรียนรู้",
-							sizeLimit: 5, closeTime: null
+							sizeLimit: 2.5, closeTime: null
 						}, "IS1-1": {
 							name: "ใบงาน IS1-1 (ประเด็นที่ต้องการศึกษา) ",
-							sizeLimit: 10, closeTime: null
+							sizeLimit: 5, closeTime: null
 						}, "IS1-2": {
 							name: "ใบงาน IS1-2 (การระบุปัญหา) ",
-							sizeLimit: 10, closeTime: null
+							sizeLimit: 5, closeTime: null
 						}, "IS1-3": {
 							name: "ใบงาน IS1-3 (การระบุสมมติฐาน) ",
-							sizeLimit: 10, closeTime: null
+							sizeLimit: 5, closeTime: null
 						}, "report-1": {
 							name: "เล่มรายงานโครงงานบทที่ 1 ",
-							sizeLimit: 20, closeTime: null
+							sizeLimit: 5, closeTime: null
 						}, "report-2": {
 							name: "เล่มรายงานโครงงานบทที่ 2 ",
-							sizeLimit: 25, closeTime: null
+							sizeLimit: 10, closeTime: null
 						}, "report-3": {
 							name: "เล่มรายงานโครงงานบทที่ 3 ",
-							sizeLimit: 25, closeTime: null
+							sizeLimit: 15, closeTime: null
 						}, "report-4": {
 							name: "เล่มรายงานโครงงานบทที่ 4 ",
-							sizeLimit: 15, closeTime: null
+							sizeLimit: 10, closeTime: null
 						}, "report-5": {
 							name: "เล่มรายงานโครงงานบทที่ 5 ",
-							sizeLimit: 20, closeTime: null
+							sizeLimit: 5, closeTime: null
 						}, "report-all": {
 							name: "รวมเล่มรายงานโครงงาน (ฉบับเต็ม)",
-							sizeLimit: 50, closeTime: null
+							sizeLimit: 30, closeTime: null
 						}, "abstract": {
 							name: "บทคัดย่อโครงงาน",
-							sizeLimit: 5, closeTime: null
+							sizeLimit: 2.5, closeTime: null
 						}, "poster": {
 							name: "โปสเตอร์",
-							sizeLimit: 30, closeTime: null
+							sizeLimit: 15, closeTime: null
 						}
 					}
 				}; var sv = {};

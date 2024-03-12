@@ -59,8 +59,11 @@
 				content: attr(data-index);
 				display: block;
 			}
-			app[name=main] .projects .card h3 a { width: 100%; }
-			app[name=main] .projects .card h3 a::first-letter { margin-left: 12px; }
+			app[name=main] .projects .card h3 a {
+				width: 100%;
+				text-indent: 12px;
+			}
+			/* app[name=main] .projects .card h3 a::first-letter { margin-left: 12px; } */
 		</style>
 		<script type="text/javascript">
 			const TRANSLATION = location.pathname.substring(1).replace(/\/$/, "").replaceAll("/", "+");
