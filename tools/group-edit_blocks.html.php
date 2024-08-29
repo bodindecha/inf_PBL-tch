@@ -1,6 +1,11 @@
 <?php
-$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/") - 1);
-require_once($dirPWroot . "resource/php/core/config.php");
+	$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/") - 1);
+	require_once($dirPWroot . "resource/php/core/config.php");
+
+	if (!isset($APP_CONST)) {
+		if (!isset($APP_RootDir)) $APP_RootDir = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/"));
+		require_once($APP_RootDir."private/config/constant.php");
+	}
 ?>
 <!--  -->
 <!--block-obj class="tab-selector" tab-type="g">
@@ -34,11 +39,11 @@ require_once($dirPWroot . "resource/php/core/config.php");
 					<tbody>
 						<tr>
 							<td>ชื่อโครงงานภาษาไทย</td>
-							<td><input name="nameth" type="text" maxlength="150" pattern="[ก-๛0-9A-Za-z ()[\]{}\-!@#$%.,/&*+_?|]{3,150}"></td>
+							<td><input name="nameth" type="text" maxlength="<?=$APP_CONST["PBL"]["lenLim"]["nameth"]?>" pattern="<?=$APP_CONST["PBL"]["REGEX"]["projNameTH"]?>"></td>
 						</tr>
 						<tr>
 							<td>ชื่อโครงงานภาษาอังกฤษ</td>
-							<td><input name="nameen" type="text" maxlength="150" pattern="[A-Za-z0-9ก-๛ ()[\]{}\-!@#$%.,/&*+_?|]{3,150}"></td>
+							<td><input name="nameen" type="text" maxlength="<?=$APP_CONST["PBL"]["lenLim"]["nameen"]?>" pattern="<?=$APP_CONST["PBL"]["REGEX"]["projNameEN"]?>"></td>
 						</tr>
 						<tr>
 							<td>หัวหน้ากลุ่ม<font style="color: var(--clr-bs-red);" data-title="จำเป็น">*</font>
@@ -81,11 +86,11 @@ require_once($dirPWroot . "resource/php/core/config.php");
 					<tbody>
 						<tr>
 							<td>ชื่อโครงงานภาษาไทย</td>
-							<td><input name="nameth" type="text" maxlength="150" pattern="[ก-๛0-9A-Za-z ()[\]{}\-!@#$%.,/&*+_?|]{3,150}"></td>
+							<td><input name="nameth" type="text" maxlength="<?=$APP_CONST["PBL"]["lenLim"]["nameth"]?>" pattern="<?=$APP_CONST["PBL"]["REGEX"]["projNameTH"]?>"></td>
 						</tr>
 						<tr>
 							<td>ชื่อโครงงานภาษาอังกฤษ</td>
-							<td><input name="nameen" type="text" maxlength="150" pattern="[A-Za-z0-9ก-๛ ()[\]{}\-!@#$%.,/&*+_?|]{3,150}"></td>
+							<td><input name="nameen" type="text" maxlength="<?=$APP_CONST["PBL"]["lenLim"]["nameen"]?>" pattern="<?=$APP_CONST["PBL"]["REGEX"]["projNameEN"]?>"></td>
 						</tr>
 						<tr>
 							<td>ครูที่ปรึกษา 1</td>

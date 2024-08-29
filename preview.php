@@ -44,7 +44,7 @@
 				$year = $read["year"];
 				$path = "resource/upload/PBL/$year/$file/$grade/$code.$extension";
 				$finder = $dirPWroot.$path;
-				$redirect = (file_exists($finder) ? "/resource/file/viewer?furl=".urlencode($path)."&name=$code%20-%20$fileCfg[$file]" : "/error/900");
+				$redirect = (file_exists($finder) ? "/_resx/service/view/file?furl=".urlencode($path)."&name=$code%20-%20$fileCfg[$file]" : "/error/900");
 			} else $redirect = "/error/900";
 		}
 	} $db -> close();

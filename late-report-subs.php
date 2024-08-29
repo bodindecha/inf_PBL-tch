@@ -137,7 +137,7 @@
 						if (!sv.available.room.includes(room)) button.attr("disabled", "");
 						container.append(button);
 					} container = container.next().empty();
-					for (let room = 13; room <= 17; room++) {
+					for (let room = 13; room <= 18; room++) {
 						button = $(`<button class="primary ripple-click" onClick="page.viewClass(${grade}, ${room})">${room}</button>`);
 						if (!sv.available.room.includes(room)) button.attr("disabled", "");
 						container.append(button);

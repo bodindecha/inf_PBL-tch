@@ -52,11 +52,14 @@
 							$year = $read["year"]; $grade = $read["grade"];
 							$path = "upload/PBL/$year/$file/$grade/$code.$extension";
 							$finder = $dirPWroot."resource/$path";
-							if (file_exists($finder)) successState(array(
-								"preview" => "/resource/file/viewer?furl=".urlencode($path)."&name=$code%20-%20$fileCfg[$file]",
-								"download" => "/resource/file/download?furl=".urlencode($path)."&name=$code%20-%20$fileCfg[$file]",
-								"print" => base64_encode("/resource/$path")
-							)); else errorMessage(3, "File not found");
+							if (file_exists($finder)) {
+								$URLattr = "?furl=".urlencode($path)."&name=PBL-$code%20$fileCfg[$attr]";
+								successState(array(
+									"preview" => "/_resx/service/view/file$URLattr",
+									"download" => "/resource/file/download$URLattr",
+									"print" => base64_encode("/resource/$path")
+								));
+							} else errorMessage(3, "File not found");
 						} else errorMessage(3, "File has not been submitted");
 					}
 				} break;

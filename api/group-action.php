@@ -28,7 +28,7 @@
 								$readstd = $getstd -> fetch_array(MYSQLI_ASSOC);
 								$grade = gen2grade($readstd["grade"]); $room = $readstd["room"];
 								$cond = "grade=$grade AND room=$room";
-								if (intval($grade) > 6 || intval($room) > 17) {
+								if (intval($grade) > 6 || intval($room) > 19) {
 									errorMessage(3, "The group leader you selected is not eligible for group creation. Please reselect and try again.");
 									slog("PBL", "new", "group", "", "fail", "", "NotEligible");
 								} else { // Create group

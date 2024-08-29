@@ -45,7 +45,7 @@
 								data='$code: $file' AND val='pass' ORDER BY time DESC,logid DESC LIMIT 1");
 								$submit_time = ($get_submit && $get_submit -> num_rows) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:i น.", strtotime(($get_submit -> fetch_array(MYSQLI_ASSOC))["time"])) : "ยังไม่ส่งไฟล์";
 								successState(array(
-									"link" => "/resource/file/viewer?furl=".urlencode($path)."&name=$code%20-%20$file",
+									"link" => "/_resx/service/view/file?furl=".urlencode($path)."&name=$code%20-%20$file",
 									"date" => $submit_time
 								));
 							} else errorMessage(3, "File not found");
@@ -55,8 +55,6 @@
 				case "score": {
 					$code = escapeSQL($attr["code"]);
 					$file = array(
-						9 => "paper",
-						10 => "present",
 						11 => "poster"
 					)[intval(escapeSQL($attr["file"]))];
 					$get = $db -> query("SELECT COALESCE(score_$file, 0) AS score FROM PBL_group WHERE code='$code'");

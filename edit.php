@@ -110,12 +110,13 @@
 			}, validate_field = pUI.form.btnState,
 			sS = {complete: () => PBL.addMember()};
 		</script>
+		<script type="text/javascript" src="/_resx/static/config/standard-PBL.js"></script>	
 		<script type="text/javascript" src="/t/PBL/v2/tools/group-edit.min.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/all-PBL.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/fs-teacher.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/fs-account.js"></script>
 		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/print.min.js"></script>
-		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/notify.min.js"></script>
+		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/jQuery/notify.min.js"></script>
 		<?php } ?>
 	</head>
 	<body>

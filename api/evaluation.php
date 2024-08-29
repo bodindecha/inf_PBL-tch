@@ -15,6 +15,7 @@
 		case "list": {
 			switch ($command) {
 				case "paper-grade": {
+					$TIMEOUT = "2024-01-08 23:59:59";
 					$result = array();
 					function appendData($get_groups, $readperm) {
 						global $result;
@@ -46,7 +47,7 @@
 						if ($get_perm -> num_rows >= 1) {
 							$timedout = false;
 							while ($readperm = $get_perm -> fetch_assoc()) {
-								if (date("Y-m-d H:i:s") > "2024-01-08 23:59:59" && $readperm["isHead"] <> "Y") {
+								if (date("Y-m-d H:i:s") > $TIMEOUT && $readperm["isHead"] <> "Y") {
 									$timedout = true;
 									continue;
 								} $get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.fileStatus&512 AS sent,a.reward FROM PBL_group a INNER JOIN PBL_cmte b ON b.year=$year AND b.tchr='$self' AND b.allow='Y' AND b.type='".$readperm["type"]."' WHERE a.mbr1 IS NOT NULL AND a.type='".$readperm["type"]."' AND a.year=$year AND (a.grader IS NULL OR a.grader=b.cmteid OR b.isHead='Y') ORDER BY a.grade,a.code");
@@ -58,6 +59,7 @@
 					else errorMessage(1, "ไม่มีโครงงานให้ตรวจในสาขาที่ท่านได้รับมอบหมาย");
 				} break;
 				case "paper-mark": {
+					$TIMEOUT = "2024-01-18 13:30:00";
 					$result = array();
 					function appendData($get_groups, $readperm) {
 						global $result;
@@ -90,7 +92,7 @@
 						if ($get_perm -> num_rows >= 1) {
 							$timedout = false;
 							while ($readperm = $get_perm -> fetch_assoc()) {
-								if (date("Y-m-d H:i:s") > "2024-01-18 13:30:00" && $readperm["isHead"] <> "Y") {
+								if (date("Y-m-d H:i:s") > $TIMEOUT && $readperm["isHead"] <> "Y") {
 									$timedout = true;
 									continue;
 								} $get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.fileStatus&512 AS sent,c.total AS mark,(SELECT COUNT(d.cmte) FROM PBL_score d WHERE d.code=a.code) AS aogc FROM PBL_group a INNER JOIN PBL_cmte b ON b.cmteid=$readperm[cmteid] LEFT JOIN PBL_score c ON a.code=c.code AND c.cmte=b.cmteid WHERE a.mbr1 IS NOT NULL AND a.type='$readperm[type]' AND a.year=$year AND NOT a.reward='5N' AND a.reward IS NOT NULL AND (b.cmteid IN(mrker1, mrker2, mrker3, mrker4, mrker5) OR CONCAT(COALESCE(mrker1, ''), COALESCE(mrker2, ''), COALESCE(mrker3, ''), COALESCE(mrker4, ''), COALESCE(mrker5, ''))='' OR b.isHead='Y') ORDER BY a.grade,a.code");

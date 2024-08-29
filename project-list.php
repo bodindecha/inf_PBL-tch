@@ -7,6 +7,11 @@
 	$forceExternalBrowser = true;
 
 	require_once($dirPWroot."resource/php/core/config.php");
+
+	if (!isset($APP_CONST)) {
+		if (!isset($APP_RootDir)) $APP_RootDir = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/"));
+		require_once($APP_RootDir."private/config/constant.php");
+	}
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -185,7 +190,7 @@
 					<div class="group">
 						<span>ที่</span>
 						<select name="search_type">
-							<option value="code" data-regex="^[A-Za-z0-9]{1,6}$">รหัสโครงงาน</option>
+							<option value="code" data-regex="<?=$APP_CONST["PBL"]["REGEX"]["code"]?>">รหัสโครงงาน</option>
 							<option value="name" data-regex="^[ก-๛0-9A-Za-z ()[\]{}\-!@#$%.,/&*+_?|]{1,150}$">ชื่อโครงงาน</option>
 							<option value="member" data-regex="^[1-9]\d{0,4}$">เลขประจำตัวสมาชิก</option>
 							<option value="advisor" data-regex="^([a-z]{3,28}\.[a-z]{1,2}|[a-zA-Z]{3,30}\d{0,3})$" disabled>ครูที่ปรึกษา</option>

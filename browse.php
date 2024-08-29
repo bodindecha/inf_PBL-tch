@@ -84,7 +84,7 @@
 						// Render choices
 						var option = $('main .form select[name="wfs"]');
 						for (let fileIndex = 0; fileIndex <= 11; fileIndex++)
-							if (dat[fileIndex] != null) option.append('<option value="'+fileIndex.toString()+'" '+(dat[fileIndex]=="0"?"disabled":"")+'>'+cv.files[fileIndex][1]+'</option>');
+							if (dat[fileIndex] != null) option.append(`<option value="${fileIndex}" ${dat[fileIndex]=="0"?"disabled":""}>${cv.files[fileIndex][1]}</option>`);
 						if (Object.values(sv.permission).includes(2)) $("main .grader").show();
 						// Show selection
 						$("main .loader").hide();
@@ -110,7 +110,7 @@
 					$("main button.open").attr("disabled", "");
 					var opt = parseInt($('main .form select[name="wfs"]').val());
 					// Grader element
-					if (opt >= 10 && opt <= 11) {
+					if (opt == 11) {
 						$("main .notRequirement").fadeOut(); // .toggle("blind");
 						$("main .grader .field").removeAttr("disabled");
 					} else {
@@ -127,10 +127,11 @@
 					// Render file
 					if (sv.permission[opt] > 0) {
 						openFile(opt);
-						if (maxScore != "") loadScore(opt);
+						if (opt == 11 && maxScore != "") loadScore(opt);
 					} else {
 						app.ui.notify(1, [3, "You don't have permission to view this file."]);
 						if (sv.fileOpen) closeFile();
+						$('main .grader [name="score:in"]').val("");
 					}
 				},
 				openFile = async function(fIdx) {
@@ -207,7 +208,7 @@
 					<button class="open blue" onClick="PBL.viewFile()" disabled>เปิด</button>
 				</div>
 				<form class="grader form message cyan" style="display: none;">
-					<p class="notRequirement message yellow">กรุณาเปิดไฟล์<u>บทคัดย่อ</u>หรือไฟล์<u>โปสเตอร์</u>เพื่อใช้ช่องลงคะแนน</p>
+					<p class="notRequirement message yellow">กรุณาเปิดไฟล์<u>โปสเตอร์</u>เพื่อใช้ช่องลงคะแนน</p>
 					<div class="field group split" disabled>
 						<div class="group">
 							<span>ได้</span>

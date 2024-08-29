@@ -437,7 +437,7 @@
 								<hr>
 								<div class="form inline center">ใช้ปุ่ม <button class="yellow icon" disabled=""><i class="material-icons" style="transform: rotate(180deg);">logout</i></button> เพื่อกลับจากหน้าประเมินคะแนนสู่หน้าตารางโครงงาน</div>
 							</center>
-							<center class="timeWarn message yellow" style="display: none;">หลังวันที่ 18 มกราคม 2567 เวลา 13.30 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
+							<center class="timeWarn message yellow" hidden style="display: none;">หลังวันที่ 18 มกราคม 2567 เวลา 13.30 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
 							<form class="form oform" onSubmit="return false;" style="display: none;" onSubmit="return false;">
 								<div class="group">
 									<span><i class="material-icons">search</i></span>

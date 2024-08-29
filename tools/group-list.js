@@ -40,7 +40,7 @@ const PBL = (function(d) {
 			$("main .mform [name=grade]").append('<option value="0">ทุกระดับชั้น</option>');
 			$("main .mform [name=room]").append('<option value="0">ทุกห้องเรียน</option>');
 			for (let grade = 1; grade <= 6; grade++) $("main .mform [name=grade]").append('<option value="'+grade+'">ม.'+grade+'</option>');
-			for (let room = 1; room <= 17; room++) $("main .mform [name=room]").append('<option value="'+room+'">'+room+'</option>');
+			for (let room = 1; room <= 19; room++) $("main .mform [name=room]").append('<option value="'+room+'">'+room+'</option>');
 			for (let pos = 0; pos < cv.workFile.length; pos++) $("main .fform [name=files]").append('<option value="'+pos+'">'+cv.workFile[pos]+'</option>');
 			for (let amt = 1; amt <= 7; amt++) $("main .fform [name=mbr_amt]").append('<option value="'+amt+'">'+amt+'</option>');
 			$("main .mform, main .fform").on("change", pUI.filter.enableSearch);
@@ -104,7 +104,7 @@ const PBL = (function(d) {
 		if (typeof data.grade !== "undefined" && (data.grade < 1 || data.grade > 6)) {
 			app.ui.notify(1, [2, "Invalid grade."]);
 			$("main .mform [name=grade]").focus();
-		} else if (typeof data.room !== "undefined" && (data.room < 1 || data.room > 17)) {
+		} else if (typeof data.room !== "undefined" && (data.room < 1 || data.room > 19)) {
 			app.ui.notify(1, [2, "Invalid room."]);
 			$("main .mform [name=room]").focus();
 		} else if (!sv.state["useFilter"]) {

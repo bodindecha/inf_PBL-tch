@@ -163,7 +163,7 @@
 						<input type="search" name="find" placeholder="Find..." onInput="PBL.filterByText()">
 					</div>
 				</form>
-				<center class="timeWarn message yellow" style="display: none;">หลังวันที่ 7 มกราคม 2567 เวลา 23.59 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
+				<center class="timeWarn message yellow" hidden style="display: none;">หลังวันที่ 7 มกราคม 2567 เวลา 23.59 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
 				<center class="message red" hidden>ขณะนี้หมดเวลาในการพิจารณาผ่าน/ไม่ผ่านโครงงานแล้ว</center>
 				<div class="proj-list message-black" -disabled>
 
