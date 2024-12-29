@@ -15,7 +15,10 @@
 		case "list": {
 			switch ($command) {
 				case "paper-grade": {
-					$TIMEOUT = "2024-01-08 23:59:59";
+					$TIMEOUT = array(
+						2566 => "2024-01-08 23:59:59",
+						2567 => "2025-01-10 23:59:59"
+					)[$year];
 					$result = array();
 					function appendData($get_groups, $readperm) {
 						global $result;
@@ -59,7 +62,10 @@
 					else errorMessage(1, "ไม่มีโครงงานให้ตรวจในสาขาที่ท่านได้รับมอบหมาย");
 				} break;
 				case "paper-mark": {
-					$TIMEOUT = "2024-01-18 13:30:00";
+					$TIMEOUT = array(
+						2566 => "2024-01-18 13:30:00",
+						2567 => "2025-01-17 23:59:59"
+					)[$year];
 					$result = array();
 					function appendData($get_groups, $readperm) {
 						global $result;

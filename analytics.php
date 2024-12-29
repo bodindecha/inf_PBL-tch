@@ -121,6 +121,9 @@
 							});
 							$("main .table tbody:not(:nth-of-type(2n+1):nth-last-of-type(2n+3)) td:nth-of-type(n+5):nth-last-child(n+17)").attr("class", "dim");
 							$("main .table tbody:first-of-type tr:not(:nth-child(2n-1):nth-last-child(2n+3)) td:nth-of-type(n+5):nth-last-child(n+17)").attr("class", "dim");
+							document.querySelectorAll('main .table tbody:not([name="gA"]) td[name=class]').forEach(ec => {
+								ec.innerHTML = `<span class="dim">ม.</span>${ec.innerText}`;
+							});
 						}
 						function toggleSubs(me) {
 							var state = me.checked,
@@ -131,6 +134,7 @@
 					</script>
 					<style type="text/css">
 						main .sh-form { margin-bottom: 10px; }
+						<?php if (has_perm("PBL")) echo 'main .sh-form + .table * { user-select: all; -webkit-user-select: all; }'; ?>
 						main tbody[name="gA"] tr:first-child { background-color: #D6E1F6; }
 						main tbody[name="gA"] tr:nth-child(2n+3) { background-color: #E9F1FE; }
 						main td:nth-child(2), main th:nth-child(2) { border-right: 2px solid var(--clr-bs-gray) !important; }

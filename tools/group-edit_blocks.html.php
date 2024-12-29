@@ -24,7 +24,7 @@
 <!--  -->
 <section class="pages" page-type="ng">
 	<div class="page" path="open">
-		<form class="form wrapper message rainbow-bg">
+		<form class="form wrapper message rainbow-bg" data-clarity-unmask="true">
 			<div class="group spread">
 				<input name="gjc" type="text" maxlength="6" size="6" pattern="[A-Za-z0-9]{6}" placeholder="Enter group code here" required>
 				<button onClick="return PBL.openGroup()" class="cyan">Load</button>
@@ -33,7 +33,7 @@
 	</div>
 	<div class="page" path="create">
 		<div class="message gray wrapper">
-			<form class="form">
+			<form class="form" data-clarity-unmask="true">
 				<p>สามารถกรอก/แก้ไขข้อมูลด้านล่างภายหลังได้</p>
 				<table class="group-info">
 					<tbody>
@@ -81,7 +81,7 @@
 <section class="pages" page-type="hg">
 	<div class="page" path="information">
 		<div class="--message gray">
-			<form class="form" onChange="pUI.form.btnState()">
+			<form class="form" onChange="pUI.form.btnState()" data-clarity-unmask="true">
 				<table class="group-info">
 					<tbody>
 						<tr>
@@ -143,7 +143,7 @@
 		<table class="list form slider">
 			<tbody></tbody>
 		</table>
-		<div class="settings message black form" onChange="pUI.form.validate()">
+		<div class="settings message black form" onChange="pUI.form.validate()" data-clarity-unmask="true">
 			<strong>การตั้งค่า</strong>
 			<div class="group split">
 				<div class="group">

@@ -92,7 +92,7 @@
 					$list = implode("', '", $projects);
 					$stacked = implode(", ", $projects);
 					if (!$isPBLmaster) {
-						$get_perm = $db -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$projects[0]' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
+						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$projects[0]' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
 							errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "assign", "grader", "$cmte: $stacked", false, "", "InvalidGetQuery");
@@ -117,7 +117,7 @@
 					$list = implode("', '", $projects);
 					$stacked = implode(", ", $projects);
 					if (!$isPBLmaster) {
-						$get_perm = $db -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$projects[0]' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
+						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$projects[0]' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
 							errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "assign", "marker", "$cmte: $stacked", false, "", "InvalidGetQuery");
@@ -193,7 +193,7 @@
 				case "referee": {
 					$project = escapeSQL($attr);
 					if (!$isPBLmaster) {
-						$get_perm = $db -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
+						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
 							errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "revoke", "grader", $project, false, "", "InvalidGetQuery");
@@ -214,7 +214,7 @@
 					$project = escapeSQL($attr["project"]);
 					$cmte = escapeSQL(rtrim(ltrim($TCL -> decrypt($attr["impact"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
 					if (!$isPBLmaster) {
-						$get_perm = $db -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
+						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
 							errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "revoke", "marker", "$project: $cmte", false, "", "InvalidGetQuery");
@@ -236,7 +236,7 @@
 				case "assignee": {
 					$project = escapeSQL($attr);
 					if (!$isPBLmaster) {
-						$get_perm = $db -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
+						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
 							errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte", false, "", "InvalidGetQuery");

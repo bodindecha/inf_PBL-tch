@@ -5,7 +5,10 @@
 	$header_desc = "ขั้นที่ 1: ผ่าน/ไม่ผ่าน";
 	$home_menu = "is-pbl";
 
-	$timesUp = strtotime("2024-01-08 23:59:59");
+	$timesUp = strtotime(array(
+		2566 => "2024-01-08 23:59:59",
+		2567 => "2025-01-10 23:59:59"
+	)[$_SESSION["stif"]["t_year"]]);
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -163,7 +166,7 @@
 						<input type="search" name="find" placeholder="Find..." onInput="PBL.filterByText()">
 					</div>
 				</form>
-				<center class="timeWarn message yellow" hidden style="display: none;">หลังวันที่ 7 มกราคม 2567 เวลา 23.59 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
+				<center class="timeWarn message yellow" style="display: none;">หลังวันที่ 10 มกราคม 2568 เวลา 23.59 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
 				<center class="message red" hidden>ขณะนี้หมดเวลาในการพิจารณาผ่าน/ไม่ผ่านโครงงานแล้ว</center>
 				<div class="proj-list message-black" -disabled>
 
