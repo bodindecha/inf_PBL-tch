@@ -154,7 +154,7 @@
 			};
 		</script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/PBL-teacher.min.js"></script>
-		<script type="text/javascript" src="/t/PBL/v2/tools/group-list.min.js"></script>
+		<script type="text/javascript" src="/t/PBL/v2/tools/group-list.min.js?d=2024-12-29"></script>
 		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/w3.min.js"></script>
 		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/jQuery/bez.min.js"></script>
 	</head>
@@ -184,7 +184,7 @@
 						<select name="type">
 							<option value=" "><?=($_COOKIE["set_lang"]=="th"?"ทั้งหมด":"All")?></option>
 							<?php foreach (str_split("ABCDEFGHIJKLM") as $et) echo '<option value="'.$et.'">'.pblcode2text($et)[$_COOKIE["set_lang"]].'</option>'; ?>
-							<option value=""><?=($_COOKIE["set_lang"]=="th"?"ยังไม่ได้เลือก":"Not chosen")?></option>
+							<option value="-"><?=($_COOKIE["set_lang"]=="th"?"ยังไม่ได้เลือก":"Not chosen")?></option>
 						</select>
 					</div>
 					<div class="group">

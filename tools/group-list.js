@@ -39,10 +39,10 @@ const PBL = (function(d) {
 			// Fill element
 			$("main .mform [name=grade]").append('<option value="0">ทุกระดับชั้น</option>');
 			$("main .mform [name=room]").append('<option value="0">ทุกห้องเรียน</option>');
-			for (let grade = 1; grade <= 6; grade++) $("main .mform [name=grade]").append('<option value="'+grade+'">ม.'+grade+'</option>');
-			for (let room = 1; room <= 19; room++) $("main .mform [name=room]").append('<option value="'+room+'">'+room+'</option>');
-			for (let pos = 0; pos < cv.workFile.length; pos++) $("main .fform [name=files]").append('<option value="'+pos+'">'+cv.workFile[pos]+'</option>');
-			for (let amt = 1; amt <= 7; amt++) $("main .fform [name=mbr_amt]").append('<option value="'+amt+'">'+amt+'</option>');
+			for (let grade = 1; grade <= 6; grade++) $("main .mform [name=grade]").append(`<option value="${grade}">ม.${grade}</option>`);
+			for (let room = 1; room <= 19; room++) $("main .mform [name=room]").append(`<option value="${room}">${room}</option>`);
+			for (let pos = 0; pos < cv.workFile.length; pos++) $("main .fform [name=files]").append(`<option value="${pos}">${cv.workFile[pos]}</option>`);
+			for (let amt = 1; amt <= 7; amt++) $("main .fform [name=mbr_amt]").append(`<option value="${amt}">${amt}</option>`);
 			$("main .mform, main .fform").on("change", pUI.filter.enableSearch);
 			// Load form
 			seek_param();
@@ -100,7 +100,7 @@ const PBL = (function(d) {
 			room: parseInt($("main .mform [name=room]").val())
 		}; if (data.grade == 0) delete data.grade;
 		if (data.room == 0) delete data.room;
-		
+
 		if (typeof data.grade !== "undefined" && (data.grade < 1 || data.grade > 6)) {
 			app.ui.notify(1, [2, "Invalid grade."]);
 			$("main .mform [name=grade]").focus();
@@ -128,8 +128,8 @@ const PBL = (function(d) {
 			if (data.isAdvisor == "A") delete data.isAdvisor;
 			if (data.mbr_comp == ">=" && data.mbr_amt == 1) { delete data.mbr_comp; delete data.mbr_amt; }
 			if (data.sort == "class" && data.order == "ASC") { delete data.sort; delete data.order; }
-			
-			if (![undefined, ...("ABCDEFGHIJKLM".split("")), ""].includes(data.type)) {
+
+			if (![undefined, ...("ABCDEFGHIJKLM-".split("")), ""].includes(data.type)) {
 				app.ui.notify(1, [2, "Invalid project type."]);
 				$("main .fform [name=type]").focus();
 			} else if (![undefined, "Y", "N"].includes(data.isAdvisor)) {
@@ -207,7 +207,7 @@ const PBL = (function(d) {
 		if (projList.length) {
 			projList.forEach(proj => {
 				result.append(projBlock(proj));
-			}); if (nextLoad != null) next.replaceWith('<button class="blue hollow small" onClick="PBL.load('+nextLoad.toString()+')">Load more</button>');
+			}); if (nextLoad != null) next.replaceWith(`<button class="blue hollow small" onClick="PBL.load(${nextLoad})">Load more</button>`);
 			else next.fadeOut(function() {
 				$(this).replaceWith('<span>——— End of results ———</span>').show();
 			}); if (!clearList) pUI.filter.update();
@@ -217,30 +217,30 @@ const PBL = (function(d) {
 			$(this).replaceWith('<span>——— End of results ———</span>').show();
 		});
 	},
-	projBlock = pi => '<li><div class="accordian" onClick="PBL.expand(this)">'+
-		'<div class="title">'+
-			'<span class="title-name txtoe">'+(pi.title == pi.code ? "" : pi.title)+'</span>'+
-			'<span class="title-code">'+pi.code+'</span>'+
-		'</div></div><div class="extender" data-code="'+pi.code+'" data-loaded="false" style="height: 0;">'+
-			'<div class="details">'+
-				'<p>สมาชิก <output name="'+pi.code+':class"></output></p>'+
-				'<table class="namelist slider"><tbody name="'+pi.code+':member"></tbody></table>'+
-				'<p hidden>สาขาโครงงาน: <output name="'+pi.code+':type"></output></p>'+
-				'<ul hidden name="'+pi.code+':advisor"></ul>'+
-				'<p>แก้ไขล่าสุด<output name="'+pi.code+':update"></output></p>'+
-				'<p hidden>ได้ <output name="'+pi.code+':score"></output> คะแนน</p>'+
-			'</div><div class="action form inline">'+
-				'<!--div class="group" hidden>'+
-					'<span class="small">Submissions</span>'+
-					'<select name="'+pi.code+':file"></select>'+
-					'<button onClick="pUI.viewFile(\''+pi.code+'\')" class="cyan small hollow">View</button>'+
-				'</div-->'+
-				'<!div class="group">'+
-					'<a role="button" href="/t/PBL/v2/group/'+pi.code+'/browse" class="purple small hollow" target="_blank" draggable="false">View submissions</a>'+
-					(cv.isModerator ? '<a role="button" href="/t/PBL/v2/group/'+pi.code+'/edit" class="orange small hollow" target="_blank" draggable="false">Overwrite</a>' : '')+
-				'<!/div>'+
-			'</div>'+
-		'</div></li>',
+	projBlock = pi => `<li><div class="accordian" onClick="PBL.expand(this)">
+		<div class="title">
+			<span class="title-name txtoe">${pi.title == pi.code ? "" : pi.title}</span>
+			<span class="title-code">${pi.code}</span>
+		</div></div><div class="extender" data-code="${pi.code}" data-loaded="false" style="height: 0;">
+			<div class="details">
+				<p>สมาชิก <output name="${pi.code}:class"></output></p>
+				<table class="namelist slider"><tbody name="${pi.code}:member"></tbody></table>
+				<p hidden>สาขาโครงงาน: <output name="${pi.code}:type"></output></p>
+				<ul hidden name="${pi.code}:advisor"></ul>
+				<p>แก้ไขล่าสุด<output name="${pi.code}:update"></output></p>
+				<p hidden>ได้ <output name="${pi.code}:score"></output> คะแนน</p>
+			</div><div class="action form inline">
+				<!-- <div class="group" hidden>
+					<span class="small">Submissions</span>
+					<select name="${pi.code}:file"></select>
+					<button onClick="pUI.viewFile('${pi.code}')" class="cyan small hollow">View</button>
+				</div> -->
+				<!div class="group">
+					<a role="button" href="/t/PBL/v2/group/${pi.code}/browse" class="purple small hollow" target="_blank" draggable="false">View submissions</a>
+					${cv.isModerator ? `<a role="button" href="/t/PBL/v2/group/${pi.code}/edit" class="orange small hollow" target="_blank" draggable="false">Overwrite</a>` : ""}
+				<!/div>
+			</div>
+		</div></li>`,
 	preview = async function(me) {
 		var infobox = $(me).next();
 		me = $(me.parentNode);
