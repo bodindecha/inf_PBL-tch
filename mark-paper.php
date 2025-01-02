@@ -231,7 +231,6 @@
 				getList = function() {
 					ajax(cv.API_URL+"evaluation", {type: "list", act: "paper-mark"}).then(function(dat) {
 						$("main .loading").remove();
-						$("main .message.timeWarn").toggle("blind");
 						if (!dat) return;
 						var ctn = $("main div.container .wrapper .page-1");
 						Object.keys(dat).forEach(ec => {
@@ -244,12 +243,12 @@
 								});
 							}); ctn.append(table+'</tbody></table></div>');
 						});
-						$("main .oform, main .message:where(.minWarn, .features)").toggle("blind");
+						$("main .oform, main .message:where(.minWarn, .features, .timeWarn)").toggle("blind");
 						$('main select[name^="pr:"]').on("change", function() {
 							var code = this.getAttribute("name").split(":")[1];
 							$('main button[onClick^="PBL.saveGrade(\''+code+'\'"]').removeAttr("disabled");
 						}); setTimeout(function() { $(window).trigger("resize"); }, 750);
-						$("main .wrapper > div").css("height", $("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height().toString()+"px");
+						$("main .wrapper > div").css("height", $(`main .wrapper .page-${$("main .wrapper > div").css("--page")}`).outerHeight().toString()+"px");
 						checkPage();
 					});
 				},
@@ -267,16 +266,16 @@
 						me.parent().replaceWith(list);
 						// Readjust view
 						var height = [
-							$("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height(),
-							$("main .wrapper .page-1").height()
+							$(`main .wrapper .page-${$("main .wrapper > div").css("--page")}`).outerHeight(),
+							$("main .wrapper .page-1").outerHeight()
 						]; $("main .wrapper > div").animate({ height: height[1] });
 						$(window).trigger("resize");
 					});
 				},
 				toPage = function(pageNo) {
 					var height = [
-						$("main .wrapper .page-"+$("main .wrapper > div").css("--page")).height(),
-						$("main .wrapper .page-"+pageNo.toString()).height()
+						$(`main .wrapper .page-${$("main .wrapper > div").css("--page")}`).outerHeight(),
+						$(`main .wrapper .page-${pageNo}`).outerHeight()
 					], wait = height[0] > height[1] ? 1e3 : 0;
 					switch (pageNo) {
 						case 1: {
@@ -437,7 +436,7 @@
 								<hr>
 								<div class="form inline center">ใช้ปุ่ม <button class="yellow icon" disabled=""><i class="material-icons" style="transform: rotate(180deg);">logout</i></button> เพื่อกลับจากหน้าประเมินคะแนนสู่หน้าตารางโครงงาน</div>
 							</center>
-							<center class="timeWarn message yellow" hidden style="display: none;">หลังวันที่ 18 มกราคม 2567 เวลา 13.30 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
+							<center class="timeWarn message yellow" style="display: none;">หลังวันที่ 17 มกราคม 2568 เวลา 23.59 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
 							<form class="form oform" onSubmit="return false;" style="display: none;" onSubmit="return false;">
 								<div class="group">
 									<span><i class="material-icons">search</i></span>

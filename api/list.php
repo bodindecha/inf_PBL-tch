@@ -12,7 +12,7 @@
 	// Execute
 	$self = $_SESSION["auth"]["user"]; $year = $_SESSION["stif"]["t_year"]; $isPBLmaster = has_perm("PBL");
 	require_once($APP_RootDir."private/script/lib/TianTcl/various.php");
-	define("PBL_ENC_KEY", "PBL-m4^/@9312");
+	define("PBL_ENC_KEY", "PBL-M4^/4g312");
 	if (empty($self)) errorMessage(3, "You are not signed-in. Please reload and try again."); else
 	switch ($type) {
 		case "group": {

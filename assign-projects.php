@@ -146,7 +146,7 @@
 								list += `<tbody data-type="${ec}"><tr><th class="css-text-left" colspan="4">${app.UI.language.getMessage("grade")} ${eg}</th></tr>`;
 								dat[ec][eg].forEach(ep => {
 									bufferC = ep.cmte == null ?
-										`<div class="css-flex center"><button class="lime pill small ripple-click" onClick="page.C.add(this)" hidden><span class="text">select</span></button></div>` :
+										'<div class="css-flex center"><button class="lime pill small ripple-click" onClick="page.C.add(this)" hidden><span class="text">select</span></button></div>' :
 										`<div class="group"><label for="ref-null">${sv.tchr[ep.cmte]} <button class="black small icon bare action ripple-click" onClick="page.C.unassign(this)"><i class="material-icons">clear</i></button></label></div>`;
 									if (ep.step > 1) {
 										bufferA = "";
@@ -195,27 +195,27 @@
 				optionBtnState = function() {
 					const currentTab = parseInt($("app[name=main] .assign > .tabs + span.bar-responsive").css("--show")) + 1,
 						isShowingForm = d.querySelector("app[name=main] main .card").open;
-					$(`app[name=main] .projects [data-type]:not([data-type=${sv.typeC}]) [data-holding^="cmte:"] button.lime`).attr("hidden", "");
-					$(`app[name=main] .projects [data-type=${sv.typeC}] [data-holding^="cmte:"] button.lime`).removeAttr("hidden");
-					$(`app[name=main] .projects [data-type]:not([data-type=${sv.typeA}]) [data-holding^="asgn:"] button.teal`).hide();
-					$(`app[name=main] .projects [data-type=${sv.typeA}] [data-holding^="asgn:"] button.teal`).show();
+					$(`app[name=main] .projects [data-type]:not([data-type=${sv.typeC}]) [data-holding^="cmte:"] button:where(.lime, .teal)`).attr("hidden", "");
+					$(`app[name=main] .projects [data-type=${sv.typeC}] [data-holding^="cmte:"] button:where(.lime, .teal)`).removeAttr("hidden");
+					$(`app[name=main] .projects [data-type]:not([data-type=${sv.typeA}]) [data-holding^="asgn:"] button:where(.teal, .lime)`).hide();
+					$(`app[name=main] .projects [data-type=${sv.typeA}] [data-holding^="asgn:"] button:where(.teal, .lime)`).show();
 					if (!isShowingForm) {
-						$(`app[name=main] .projects [data-holding^="cmte:"] button.lime`).parent().attr("hidden", "");
+						$(`app[name=main] .projects [data-holding^="cmte:"] button:where(.lime, .teal)`).parent().attr("hidden", "");
 						$(`app[name=main] .projects [data-holding^="asgn:"] .chooser`).hide();
 						$("app[name=main] .projects [data-step=1]").show();
 					} else switch (currentTab) {
 						case 1: {
-							$(`app[name=main] .projects [data-holding^="cmte:"] button.lime`).parent().attr("hidden", "");
+							$(`app[name=main] .projects [data-holding^="cmte:"] button:where(.lime, .teal)`).parent().attr("hidden", "");
 							$(`app[name=main] .projects [data-holding^="asgn:"] .chooser`).hide();
 							$("app[name=main] .projects [data-step=1]").show();
 						} break;
 						case 2: {
-							$(`app[name=main] .projects [data-holding^="cmte:"] button.lime`).parent().removeAttr("hidden");
+							$(`app[name=main] .projects [data-holding^="cmte:"] button:where(.lime, .teal)`).parent().removeAttr("hidden");
 							$(`app[name=main] .projects [data-holding^="asgn:"] .chooser`).hide();
 							$("app[name=main] .projects [data-step=1]").show();
 						} break;
 						case 3: {
-							$(`app[name=main] .projects [data-holding^="cmte:"] button.lime`).parent().attr("hidden", "");
+							$(`app[name=main] .projects [data-holding^="cmte:"] button:where(.lime, .teal)`).parent().attr("hidden", "");
 							$(`app[name=main] .projects [data-holding^="asgn:"] .chooser`).show();
 							$("app[name=main] .projects [data-step=1]").hide();
 						} break;
@@ -240,7 +240,7 @@
 					},
 					clearSelected = function(imediately = false) {
 						fv.targetProj = [];
-						$(`app[name=main] .projects [data-type] [data-holding^="cmte:"] button.lime`).removeAttr("disabled");
+						$(`app[name=main] .projects [data-type] [data-holding^="cmte:"] button.teal`).removeAttr("disabled").toggleClass("lime teal");
 						optionBtnState();
 						setTimeout(() => {
 							$("app[name=main] .to-proj button").fadeOut(1e3, function() { this.remove(); });
@@ -253,7 +253,7 @@
 						$("app[name=main] .to-proj").append(nameTag);
 						setTimeout(() => nameTag.toggle("clip"), 250);
 						fv.targetProj.push(code);
-						$(me).attr("disabled", "");
+						$(me).attr("disabled", "").toggleClass("lime teal");
 						buttonState();
 					},
 					remove = function(me) {
@@ -264,7 +264,7 @@
 							.animate({width: 0, padding: 0, borderWidth: 0, marginLeft: -10}, 5e2, "linear", function() {
 								setTimeout(() => me.remove(), 1e2);
 							});
-						$(`app[name=main] .projects [data-holding="cmte:${reference}"] button.lime`).removeAttr("disabled");
+						$(`app[name=main] .projects [data-holding="cmte:${reference}"] button.teal`).removeAttr("disabled").toggleClass("lime teal");
 						buttonState();
 					},
 					assign = function() {
@@ -336,7 +336,7 @@
 					},
 					clearSelected = function(imediately = false) {
 						fv.targetProj = [];
-						$(`app[name=main] .projects [data-type] [data-holding^="asgn:"] button.teal`).removeAttr("disabled");
+						$(`app[name=main] .projects [data-type] [data-holding^="asgn:"] button.lime`).removeAttr("disabled").toggleClass("teal lime");
 						optionBtnState();
 						setTimeout(() => {
 							$("app[name=main] .with-proj button").fadeOut(1e3, function() { this.remove(); });
@@ -349,7 +349,7 @@
 						$("app[name=main] .with-proj").append(nameTag);
 						setTimeout(() => nameTag.toggle("clip"), 250);
 						fv.targetProj.push(code);
-						$(me).attr("disabled", "");
+						$(me).attr("disabled", "").toggleClass("teal lime");
 						buttonState();
 					},
 					remove = function(me) {
@@ -360,7 +360,7 @@
 							.animate({width: 0, padding: 0, borderWidth: 0, marginLeft: -10}, 5e2, "linear", function() {
 								setTimeout(() => me.remove(), 1e2);
 							});
-						$(`app[name=main] .projects [data-holding="asgn:${reference}"] button.teal`).removeAttr("disabled");
+						$(`app[name=main] .projects [data-holding="asgn:${reference}"] button.lime`).removeAttr("disabled").toggleClass("teal lime");
 						buttonState();
 					},
 					assign = function() {
