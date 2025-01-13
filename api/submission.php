@@ -173,7 +173,7 @@
 							$success = $db -> query("INSERT INTO PBL_score (cmte,code,raw,total,note,ip) VALUES($cmte,'$code','$raw',$total,'$note','$ip')");
 							$action = "new";
 						} else {
-							$success = $db -> query("UPDATE PBL_score SET cmte=$cmte,code='$code',raw='$raw',total=$total,note='$note',ip='$ip' WHERE refID=".$read["refID"]);
+							$success = $db -> query("UPDATE PBL_score SET cmte=$cmte,code='$code',raw='$raw',total=$total,note='$note',edit=edit+1,ip='$ip' WHERE refID=".$read["refID"]);
 							$action = "edit";
 						} if ($success) {
 							successState();
