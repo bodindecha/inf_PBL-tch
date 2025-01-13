@@ -161,6 +161,12 @@
 									$proj_group = implode("', '", $proceed[$spot]);
 									$replace_query .= ",$spot=(CASE WHEN code IN ('$proj_group') THEN $cmte ELSE $spot END)";
 								} $success = $APP_DB[0] -> query("UPDATE PBL_group SET lastupdate=lastupdate$replace_query WHERE code IN ('$list')");
+								/**
+								 * S: Success
+								 * R: Duplicate committee
+								 * U: Unexisting project
+								 * F: Full assignee
+								 */
 								if ($success) {
 									successState(array(
 										"referee" => $attr["committee"],

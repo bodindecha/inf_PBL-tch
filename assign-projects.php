@@ -56,14 +56,14 @@
 				transform: translate(calc(100% * var(--show)), -100%);
 				width: calc(100% / var(--tabAmt)); height: 2.5px;
 				background-color: var(--clr-pp-cyan-800);
-				display: block; transition: var(--time-tst-xfast);
+				display: block; transition: var(--time-tst-fast);
 				pointer-events: none;
 			}
 			/* app[name=main] .assign > .tabs:active + span.bar-responsive { animation: bar_moving var(--time-tst-fast) ease 1; } */
 			@keyframes bar_moving {
 				0%, 100% { width: calc(100% / var(--tabAmt)); }
-				5%, 95% { width: calc(100% / var(--tabAmt) * 1.25); }
-				50% { width: calc(100% / var(--tabAmt) * 0.75); }
+				5%, 95% { width: calc(100% / var(--tabAmt) * 1.75); }
+				50% { width: calc(100% / var(--tabAmt) * 0.25); }
 			}
 			app[name=main] .assign > .space { transform: translateY(-2.5px); }
 			app[name=main] .assign > .space div > p { margin: 7.5px 0 0; }
