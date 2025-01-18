@@ -110,6 +110,7 @@
 			}, validate_field = pUI.form.btnState,
 			sS = {complete: () => PBL.addMember()};
 		</script>
+		<script type="text/javascript" src="/_resx/static/script/core/customize.js"></script>	
 		<script type="text/javascript" src="/_resx/static/config/standard-PBL.js"></script>	
 		<script type="text/javascript" src="/t/PBL/v2/tools/group-edit.min.js"></script>
 		<script type="text/javascript" src="/resource/js/extend/all-PBL.js"></script>
