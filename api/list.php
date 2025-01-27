@@ -108,7 +108,7 @@
 				case "assignees": {
 					$result = array();
 					function appendData($get_groups, $readperm) {
-						global $result, $TCL;
+						global $result;
 						if ($get_groups -> num_rows) {
 							$category = array(); $grade = "0"; $grades = array();
 							while ($readgroup = $get_groups -> fetch_assoc()) {
@@ -118,11 +118,11 @@
 										$grades = array();
 									} $grade = $readgroup["grade"];
 								} $markers = array_values(array_filter(array($readgroup["mrker1"], $readgroup["mrker2"], $readgroup["mrker3"], $readgroup["mrker4"], $readgroup["mrker5"])));
-								for ($marker = 0; $marker < count($markers); $marker++) $markers[$marker] = $TCL -> encrypt("PBL-".$markers[$marker]."cmte", PBL_ENC_KEY, 2);
+								for ($marker = 0; $marker < count($markers); $marker++) $markers[$marker] = TianTcl::encrypt("PBL-".$markers[$marker]."cmte", PBL_ENC_KEY, 2);
 								array_push($grades, array(
 									"code" => $readgroup["code"],
 									"name" => $readgroup["name"],
-									"cmte" => $readgroup["grader"] == null ? null : $TCL -> encrypt("PBL-".$readgroup["grader"]."cmte", PBL_ENC_KEY, 2),
+									"cmte" => $readgroup["grader"] == null ? null : TianTcl::encrypt("PBL-".$readgroup["grader"]."cmte", PBL_ENC_KEY, 2),
 									"asgn" => $markers,
 									"step" => intval($readgroup["round"]),
 								));

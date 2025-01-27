@@ -126,17 +126,15 @@
 		case "setRank": {
 			require_once($dirPWroot."../private/script/lib/TianTcl/various.php");
 			function createToken() {
-				global $TCL;
 				$token = uniqid("PBL:");
-				$TCL -> sessVar("PBL-token", $token);
-				return $TCL -> encrypt($token, "PBL[master]{PSR}");
+				TianTcl::sessVar("PBL-token", $token);
+				return TianTcl::encrypt($token, "PBL[master]{PSR}");
 			}
 			function checkToken($token) {
-				global $TCL;
-				$token = $TCL -> decrypt($token, "PBL[master]{PSR}");
-				$compare = $TCL -> sessVar("PBL-token");
+				$token = TianTcl::decrypt($token, "PBL[master]{PSR}");
+				$compare = TianTcl::sessVar("PBL-token");
 				$result = $token == $compare;
-				if ($result) $TCL -> sessVar("PBL-token", null);
+				if ($result) TianTcl::sessVar("PBL-token", null);
 				return $result;
 			}
 			switch ($command) {
@@ -145,7 +143,13 @@
 						errorMessage(3, "You don't have permission to view this data");
 						slog("PBL", "load", "reward", "", "fail", "", "Unauthorized");
 					} else {
-						$get = $db -> query("SELECT a.code,a.grade,a.room,a.type,(SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) AS score,a.reward,(CASE WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 59 THEN '4M' WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 69 THEN '3B' WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 70 AND 79 THEN '2S' WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 80 AND 100 THEN '1G' WHEN a.reward IN ('1G', '2S', '3B', '4M') THEN '0P' ELSE a.reward END) AS new_reward FROM PBL_group a WHERE a.year=$year AND a.reward IS NOT NULL AND a.reward != '5N' ORDER BY a.grade,a.room,a.code");
+						$get = $db -> query("SELECT a.code,a.grade,a.room,a.type,(SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) AS score,a.reward,(CASE
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 80 AND 100 THEN '1G'
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 70 AND 80 THEN '2S'
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 70 THEN '3B'
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 60 THEN '4M'
+							WHEN a.reward IN ('1G', '2S', '3B', '4M') THEN '0P' ELSE a.reward
+						END) AS new_reward FROM PBL_group a WHERE a.year=$year AND a.reward IS NOT NULL AND a.reward != '5N' ORDER BY a.grade,a.room,a.code");
 						if (!$get) {
 							errorMessage(3, "There's an error generating preview");
 							slog("PBL", "load", "reward", "", "fail", "", "InvalidQuery");
@@ -193,7 +197,12 @@
 						errorMessage(2, "Token mismatched. Please try again");
 						slog("PBL", "edit", "reward", "", "fail", "", "InvalidToken");
 					} else {
-						$success = $db -> query("UPDATE PBL_group a SET a.lastupdate=a.lastupdate,a.reward=(CASE WHEN (SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 59 THEN '4M' WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 69 THEN '3B' WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 70 AND 79 THEN '2S' WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 80 AND 100 THEN '1G' ELSE a.reward END),a.lastupdate=a.lastupdate WHERE a.year=$year AND a.reward IS NOT NULL AND a.reward != '5N'");
+						$success = $db -> query("UPDATE PBL_group a SET a.lastupdate=a.lastupdate,a.reward=(CASE
+							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 80 AND 100 THEN '1G'
+							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 70 AND 80 THEN '2S'
+							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 70 THEN '3B'
+							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 60 THEN '4M'
+						ELSE a.reward END),a.lastupdate=a.lastupdate WHERE a.year=$year AND a.reward IS NOT NULL AND a.reward != '5N'");
 						if ($success) {
 							successState();
 							slog("PBL", "edit", "reward", "", "pass");

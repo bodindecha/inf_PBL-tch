@@ -1,41 +1,41 @@
 <?php
-	# $normal_params = false;
 	$APP_RootDir = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/"));
 	require_once($APP_RootDir."private/script/start/API.php");
+	API::initialize();
 	// Execute
 	$year = $_SESSION["stif"]["t_year"] ?? null;
 	$isPBLmaster = has_perm("PBL");
 	require_once($APP_RootDir."private/script/lib/TianTcl/various.php");
 	define("PBL_ENC_KEY", "PBL-M4^/4g312");
-	if (empty($APP_USER)) errorMessage(3, "You are not signed-in. Please reload and try again."); else
-	switch ($action) {
+	if (empty($APP_USER)) API::errorMessage(3, "You are not signed-in. Please reload and try again."); else
+	switch (API::$action) {
 		case "list": {
 			require($APP_RootDir."public_html/resource/php/core/config.php");
-			switch ($command) {
+			switch (API::$command) {
 				case "control": {
 					$get = $APP_DB[0] -> query("SELECT a.cmteid,a.type,a.allow,a.isHead,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS namefull FROM PBL_cmte a INNER JOIN user_t b ON a.tchr=b.namecode WHERE a.cmteid>0 AND a.year=$year ORDER BY a.type,b.namefth,b.namelth");
-					if (!$get) errorMessage(3, "Unable to load comittee list.");
+					if (!$get) API::errorMessage(3, "Unable to load comittee list.");
 					else {
 						$cmtes = array();
 						if ($get -> num_rows) while ($read = $get -> fetch_assoc()) {
 							array_push($cmtes, array(
-								"impact" => $TCL -> encrypt("PBL-".$read["cmteid"]."cmte", PBL_ENC_KEY, 2),
+								"impact" => TianTcl::encrypt("PBL-".$read["cmteid"]."cmte", PBL_ENC_KEY, 2),
 								"name" => prefixcode2text($read["namep"])["th"].$read["namefull"],
 								"branch" => pblcode2text($read["type"])["th"],
 								"active" => $read["allow"] == "Y",
 								"chief" => $read["isHead"] == "Y"
 							));
-						} successState(array("ifo" => $cmtes));
+						} API::successState(array("ifo" => $cmtes));
 					}
 				break; }
 				case "names": {
 					$result = array();
 					function appendData($get_cmte, $readperm) {
-						global $result, $TCL;
+						global $result;
 						if ($get_cmte -> num_rows) {
 							$category = array();
 							while ($read = $get_cmte -> fetch_assoc()) array_push($category, array(
-								"impact" => $TCL -> encrypt("PBL-".$read["cmteid"]."cmte", PBL_ENC_KEY, 2),
+								"impact" => TianTcl::encrypt("PBL-".$read["cmteid"]."cmte", PBL_ENC_KEY, 2),
 								"user_reference" => $read["tchr"],
 								"name" => prefixcode2text($read["namep"])["th"].$read["namefth"]."  ".$read["namelth"]
 							)); if (count($category)) $result[$readperm] = $category;
@@ -48,91 +48,91 @@
 						if ($get_perm -> num_rows) while ($readperm = $get_perm -> fetch_assoc()) {
 							$get_cmte = $APP_DB[0] -> query("SELECT a.cmteid,a.tchr,b.namep,b.namefth,b.namelth FROM PBL_cmte a INNER JOIN user_t b ON b.namecode=a.tchr WHERE a.type='$readperm[type]' AND a.year=$year AND a.allow='Y' ORDER BY b.namefth,b.namelth");
 							appendData($get_cmte, $readperm["type"]);
-						} else if (!$get_perm) errorMessage(1, "You are not assigned as a head of any project type");
-						else errorMessage(3, "Unable to read names");
-					} if (count($result)) successState($result);
-					else errorMessage(1, "ไม่มีกรรมการในสาขาที่ท่านได้รับมอบหมาย");
+						} else if (!$get_perm) API::errorMessage(1, "You are not assigned as a head of any project type");
+						else API::errorMessage(3, "Unable to read names");
+					} if (count($result)) API::successState($result);
+					else API::errorMessage(1, "ไม่มีกรรมการในสาขาที่ท่านได้รับมอบหมาย");
 				break; }
-				default: errorMessage(1, "Invalid command"); break;
+				default: API::errorMessage(1, "Invalid command"); break;
 			}
 		break; }
 		case "mod": {
-			switch ($command) {
+			switch (API::$command) {
 				case "setStatus": {
-					$user = escapeSQL(rtrim(ltrim($TCL -> decrypt($attr["target"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
-					$status = $attr["state"]=="true" ? "Y" : "N";
-					$field = escapeSQL($attr["field"]);
+					$user = escapeSQL(rtrim(ltrim(TianTcl::decrypt(API::$attr["target"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
+					$status = API::$attr["state"]=="true" ? "Y" : "N";
+					$field = escapeSQL(API::$attr["field"]);
 					$success = $APP_DB[0] -> query("UPDATE PBL_cmte SET $field='$status' WHERE cmteid=$user");
 					if ($success) {
 						syslog_a(null, "PBL", "edit", "cmte", "$user: $field=$status");
-						successState();
+						API::successState();
 					} else syslog_a(null, "PBL", "edit", "cmte", "$user: $field=$status", false, "", "InvalidQuery");
 				break; }
 				case "assign": {
-					$type = escapeSQL($attr["type"]);
-					$users = implode("','$type'),($year,'", explode(", ", base64_decode($attr["candidate"])));
-					$logData = str_replace(" ", "", base64_decode($attr["candidate"]));
+					$type = escapeSQL(API::$attr["type"]);
+					$users = implode("','$type'),($year,'", explode(", ", base64_decode(API::$attr["candidate"])));
+					$logData = str_replace(" ", "", base64_decode(API::$attr["candidate"]));
 					$success = $APP_DB[0] -> query("INSERT INTO PBL_cmte (year,tchr,type) VALUES($year,'$users','$type')");
 					if ($success) {
 						syslog_a(null, "PBL", "new", "cmte", "$type: $logData");
-						successState();
+						API::successState();
 					} else {
-						errorMessage(3, "There's an error. Please try again.");
+						API::errorMessage(3, "There's an error. Please try again.");
 						syslog_a(null, "PBL", "new", "cmte", "$type: $logData", false, "", "InvalidQuery");
 					}
 				break; }
-				default: errorMessage(1, "Invalid command"); break;
+				default: API::errorMessage(1, "Invalid command"); break;
 			}
 		break; }
 		case "assign": {
-			switch ($command) {
+			switch (API::$command) {
 				case "referee": {
-					$cmte = escapeSQL(rtrim(ltrim($TCL -> decrypt($attr["committee"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
-					$projects = explode("-", escapeSQL(base64_decode($attr["projects"])));
+					$cmte = escapeSQL(rtrim(ltrim(TianTcl::decrypt(API::$attr["committee"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
+					$projects = explode("-", escapeSQL(base64_decode(API::$attr["projects"])));
 					$list = implode("', '", $projects);
 					$stacked = implode(", ", $projects);
 					if (!$isPBLmaster) {
 						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$projects[0]' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
-							errorMessage(3, "Unable to check permission");
+							API::errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "assign", "grader", "$cmte: $stacked", false, "", "InvalidGetQuery");
 						} else if (!$get_perm -> num_rows) {
-							errorMessage(3, "You don't have permission to perform this action");
+							API::errorMessage(3, "You don't have permission to perform this action");
 							syslog_a(null, "PBL", "assign", "grader", "$cmte: $stacked", false, "", "NoPermission");
 						} else goto hasPerm1;
 					} else {
 						hasPerm1:
 						$success = $APP_DB[0] -> query("UPDATE PBL_group SET lastupdate=lastupdate,grader=$cmte WHERE code IN ('$list')");
 						if ($success) {
-							successState(array(
-								"referee" => $attr["committee"],
+							API::successState(array(
+								"referee" => API::$attr["committee"],
 								"updated" => $projects
 							)); syslog_a(null, "PBL", "assign", "grader", "$cmte: $stacked");
 						} else syslog_a(null, "PBL", "assign", "grader", "$cmte: $stacked", false, "", "InvalidQuery");
 					}
 				break; }
 				case "project": {
-					$cmte = escapeSQL(rtrim(ltrim($TCL -> decrypt($attr["committee"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
-					$projects = explode("-", escapeSQL(base64_decode($attr["projects"])));
+					$cmte = escapeSQL(rtrim(ltrim(TianTcl::decrypt(API::$attr["committee"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
+					$projects = explode("-", escapeSQL(base64_decode(API::$attr["projects"])));
 					$list = implode("', '", $projects);
 					$stacked = implode(", ", $projects);
 					if (!$isPBLmaster) {
 						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$projects[0]' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
-							errorMessage(3, "Unable to check permission");
+							API::errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "assign", "marker", "$cmte: $stacked", false, "", "InvalidGetQuery");
 						} else if (!$get_perm -> num_rows) {
-							errorMessage(3, "You don't have permission to perform this action");
+							API::errorMessage(3, "You don't have permission to perform this action");
 							syslog_a(null, "PBL", "assign", "marker", "$cmte: $stacked", false, "", "NoPermission");
 						} else goto hasPerm2;
 					} else {
 						hasPerm2:
 						$findspot = $APP_DB[0] -> query("SELECT code,mbr1,mrker1,mrker2,mrker3,mrker4,mrker5 FROM PBL_group WHERE code IN ('$list')");
 						if (!$findspot) {
-							errorMessage(3, "Unable get information. Please try again.");
+							API::errorMessage(3, "Unable get information. Please try again.");
 							syslog_a(null, "PBL", "assign", "marker", "$cmte: $stacked", false, "", "InvalidCheckQuery");
 						} else if (!$findspot -> num_rows) {
-							errorMessage(1, "None of the selected group is available for assigning");
+							API::errorMessage(1, "None of the selected group is available for assigning");
 							syslog_a(null, "PBL", "assign", "marker", "$cmte: $stacked", false, "", "NotFound");
 						} else { // Check spot
 							$proceed = array(); $refused = array(); $unexist = array(); $failed = array();
@@ -168,64 +168,64 @@
 								 * F: Full assignee
 								 */
 								if ($success) {
-									successState(array(
-										"referee" => $attr["committee"],
+									API::successState(array(
+										"referee" => API::$attr["committee"],
 										"updated" => array_merge(...array_values($proceed))
 									)); syslog_a(null, "PBL", "assign", "marker", "$cmte: S($stackedS) R($stackedR) U($stackedU) F($stackedF)");
-									if (!empty($refused)) infoMessage(1, "Cannot assign committee to projects they're already assigned: $stackedR");
-									if (!empty($unexist)) infoMessage(1, "Committee cannot be assigned to unexisting projects: $stackedU");
-									if (!empty($failed)) infoMessage(2, "Committee cannot be assigned to projects that already have 5 assignees: $stackedF");
+									if (!empty($refused)) API::infoMessage(1, "Cannot assign committee to projects they're already assigned: $stackedR");
+									if (!empty($unexist)) API::infoMessage(1, "Committee cannot be assigned to unexisting projects: $stackedU");
+									if (!empty($failed)) API::infoMessage(2, "Committee cannot be assigned to projects that already have 5 assignees: $stackedF");
 								} else {
 									syslog_a(null, "PBL", "assign", "marker", "$cmte: S($stackedS) R($stackedR) U($stackedU) F($stackedF)", false, "", "InvalidQuery");
-									if (!empty($refused)) infoMessage(1, "Cannot assign committee to projects they're already assigned: $stackedR");
-									if (!empty($unexist)) errorMessage(1, "Committee cannot be assigned to unexisting projects: $stackedU");
-									if (!empty($failed)) errorMessage(2, "Committee cannot be assigned to projects that already have 5 assignees: $stackedF");
+									if (!empty($refused)) API::infoMessage(1, "Cannot assign committee to projects they're already assigned: $stackedR");
+									if (!empty($unexist)) API::errorMessage(1, "Committee cannot be assigned to unexisting projects: $stackedU");
+									if (!empty($failed)) API::errorMessage(2, "Committee cannot be assigned to projects that already have 5 assignees: $stackedF");
 								}
 							} else {
-								errorMessage(3, "Cannot assign committee to any selected project");
+								API::errorMessage(3, "Cannot assign committee to any selected project");
 								syslog_a(null, "PBL", "assign", "marker", "$cmte: R($stackedR) U($stackedU) F($stackedF)", false, "", "Empty");
-								if (!empty($refused)) infoMessage(1, "Cannot assign committee to projects they're already assigned: $stackedR");
-								if (!empty($unexist)) errorMessage(1, "Committee cannot be assigned to unexisting projects: $stackedU");
-								if (!empty($failed)) errorMessage(2, "Committee cannot be assigned to projects that already have 5 assignees: $stackedF");
+								if (!empty($refused)) API::infoMessage(1, "Cannot assign committee to projects they're already assigned: $stackedR");
+								if (!empty($unexist)) API::errorMessage(1, "Committee cannot be assigned to unexisting projects: $stackedU");
+								if (!empty($failed)) API::errorMessage(2, "Committee cannot be assigned to projects that already have 5 assignees: $stackedF");
 							}
 						}
 					}
 				break; }
-				default: errorMessage(1, "Invalid command"); break;
+				default: API::errorMessage(1, "Invalid command"); break;
 			}
 		break; }
 		case "revoke": {
-			switch ($command) {
+			switch (API::$command) {
 				case "referee": {
-					$project = escapeSQL($attr);
+					$project = escapeSQL(API::$attr);
 					if (!$isPBLmaster) {
 						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
-							errorMessage(3, "Unable to check permission");
+							API::errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "revoke", "grader", $project, false, "", "InvalidGetQuery");
 						} else if (!$get_perm -> num_rows) {
-							errorMessage(3, "You don't have permission to perform this action");
+							API::errorMessage(3, "You don't have permission to perform this action");
 							syslog_a(null, "PBL", "revoke", "grader", $project, false, "", "NoPermission");
 						} else goto hasPerm3;
 					} else {
 						hasPerm3:
 						$success = $APP_DB[0] -> query("UPDATE PBL_group SET lastupdate=lastupdate,grader=NULL WHERE code='$project'");
 						if ($success) {
-							successState();
+							API::successState();
 							syslog_a(null, "PBL", "revoke", "grader", $project);
 						} else syslog_a(null, "PBL", "revoke", "grader", $project, false, "", "InvalidQuery");
 					}
 				break; }
 				case "project": {
-					$project = escapeSQL($attr["project"]);
-					$cmte = escapeSQL(rtrim(ltrim($TCL -> decrypt($attr["impact"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
+					$project = escapeSQL(API::$attr["project"]);
+					$cmte = escapeSQL(rtrim(ltrim(TianTcl::decrypt(API::$attr["impact"], PBL_ENC_KEY, 2), "PBL-"), "cmte"));
 					if (!$isPBLmaster) {
 						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
-							errorMessage(3, "Unable to check permission");
+							API::errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "revoke", "marker", "$project: $cmte", false, "", "InvalidGetQuery");
 						} else if (!$get_perm -> num_rows) {
-							errorMessage(3, "You don't have permission to perform this action");
+							API::errorMessage(3, "You don't have permission to perform this action");
 							syslog_a(null, "PBL", "revoke", "marker", "$project: $cmte", false, "", "NoPermission");
 						} else goto hasPerm4;
 					} else {
@@ -234,20 +234,20 @@
 						for ($index = 1; $index <= 5; $index++) $replace_query .= ",mrker$index=(CASE WHEN mrker$index=$cmte THEN NULL ELSE mrker$index END)";
 						$success = $APP_DB[0] -> query("UPDATE PBL_group SET lastupdate=lastupdate$replace_query WHERE code='$project'");
 						if ($success) {
-							successState();
+							API::successState();
 							syslog_a(null, "PBL", "revoke", "marker", "$project: $cmte");
 						} else syslog_a(null, "PBL", "revoke", "marker", "$project: $cmte", false, "", "InvalidQuery");
 					}
 				break; }
 				case "assignee": {
-					$project = escapeSQL($attr);
+					$project = escapeSQL(API::$attr);
 					if (!$isPBLmaster) {
 						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
-							errorMessage(3, "Unable to check permission");
+							API::errorMessage(3, "Unable to check permission");
 							syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte", false, "", "InvalidGetQuery");
 						} else if (!$get_perm -> num_rows) {
-							errorMessage(3, "You don't have permission to perform this action");
+							API::errorMessage(3, "You don't have permission to perform this action");
 							syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte", false, "", "NoPermission");
 						} else goto hasPerm5;
 					} else {
@@ -256,15 +256,14 @@
 						for ($index = 1; $index <= 5; $index++) $replace_query .= ",mrker$index=NULL";
 						$success = $APP_DB[0] -> query("UPDATE PBL_group SET lastupdate=lastupdate$replace_query WHERE code='$project'");
 						if ($success) {
-							successState();
+							API::successState();
 							syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte");
 						} else syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte", false, "", "InvalidQuery");
 					}
 				break; }
-				default: errorMessage(1, "Invalid command"); break;
+				default: API::errorMessage(1, "Invalid command"); break;
 			}
 		break; }
-		default: errorMessage(1, "Invalid type"); break;
-	} $APP_DB[0] -> close();
-	sendOutput();
+		default: API::errorMessage(1, "Invalid type"); break;
+	} API::sendOutput();
 ?>
