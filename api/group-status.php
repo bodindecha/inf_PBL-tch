@@ -53,7 +53,7 @@
 							$path = "upload/PBL/$year/$file/$grade/$code.$extension";
 							$finder = $dirPWroot."resource/$path";
 							if (file_exists($finder)) {
-								$URLattr = "?furl=".urlencode($path)."&name=PBL-$code%20$fileCfg[$attr]";
+								$URLattr = "?furl=".urlencode($path)."&name=PBL-$code%20".$fileCfg[$file];
 								successState(array(
 									"preview" => "/_resx/service/view/file$URLattr",
 									"download" => "/resource/file/download$URLattr",

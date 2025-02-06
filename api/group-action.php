@@ -20,53 +20,52 @@
 					} else {
 						$getstd = $db -> query("SELECT gen,room FROM user_s WHERE stdid=".$attr["mbr1"]);
 						if (!$getstd) errorMessage(3, "Error loading student's data. Please try again.");
-						else {
-							if (!$getstd -> num_rows) {
-								errorMessage(3, "The group leader you selected doesn't exists.");
-								slog("PBL", "new", "group", "", "fail", "", "Unavailable");
-							} else {
-								$readstd = $getstd -> fetch_array(MYSQLI_ASSOC);
-								$grade = gen2grade($readstd["grade"]); $room = $readstd["room"];
-								$cond = "grade=$grade AND room=$room";
-								if (intval($grade) > 6 || intval($room) > 19) {
-									errorMessage(3, "The group leader you selected is not eligible for group creation. Please reselect and try again.");
-									slog("PBL", "new", "group", "", "fail", "", "NotEligible");
-								} else { // Create group
-									// Read arguments
-									$nameth = escapeSQL(htmlspecialchars(preg_replace("/เเ/", "แ", $attr["nameth"])));
-									$nameen = escapeSQL(htmlspecialchars(preg_replace("/เเ/", "แ", $attr["nameen"])));
-									$mbr1 = escapeSQL($attr["mbr1"]);
-									$adv1 = (empty($attr["adv1"]) ? "NULL" : "'".escapeSQL($attr["adv1"])."'");
-									$adv2 = (empty($attr["adv2"]) ? "NULL" : "'".escapeSQL($attr["adv2"])."'");
-									$adv3 = (empty($attr["adv3"]) ? "NULL" : "'".escapeSQL($attr["adv3"])."'");
-									$type = escapeSQL($attr["type"]);
-									// Plagiarsm check
-									$getPlag = $db -> query("SELECT code,year,nameth,nameen FROM PBL_group WHERE nameth='$nameth' OR nameen='$nameen' ORDER BY year ASC LIMIT 1");
-									if (false && $getPlag -> num_rows) {
-										$readPlag = $getPlag -> fetch_array(MYSQLI_ASSOC);
-										errorMessage(1, "โครงงาน \"$readPlag[nameth]\" ($readPlag[nameen]) ได้มีการทำขึ้นแล้วในปีการศึกษา $readPlag[year] (รหัสโครงงาน $readPlag[code]). กรุณาเลือกชื่อโครงงานอื่น");
-										slog("PBL", "new", "group", $code, "fail", "", "Duplicate");
+						else if (!$getstd -> num_rows) {
+							errorMessage(3, "The group leader you selected doesn't exists.");
+							slog("PBL", "new", "group", "", "fail", "", "Unavailable");
+						} else {
+							$readstd = $getstd -> fetch_array(MYSQLI_ASSOC);
+							$grade = gen2grade($readstd["gen"]); $room = $readstd["room"];
+							$cond = "grade=$grade AND room=$room";
+							if (intval($grade) > 6 || intval($room) > 19) {
+								errorMessage(3, "The group leader you selected is not eligible for group creation. Please reselect and try again.");
+								slog("PBL", "new", "group", "", "fail", "", "NotEligible");
+							} else { // Create group
+								// Read arguments
+								$nameth = escapeSQL(htmlspecialchars(preg_replace("/เเ/", "แ", $attr["nameth"])));
+								$nameen = escapeSQL(htmlspecialchars(preg_replace("/เเ/", "แ", $attr["nameen"])));
+								$mbr1 = escapeSQL($attr["mbr1"]);
+								$adv1 = (empty($attr["adv1"]) ? "NULL" : "'".escapeSQL($attr["adv1"])."'");
+								$adv2 = (empty($attr["adv2"]) ? "NULL" : "'".escapeSQL($attr["adv2"])."'");
+								$adv3 = (empty($attr["adv3"]) ? "NULL" : "'".escapeSQL($attr["adv3"])."'");
+								$type = escapeSQL($attr["type"]);
+								// Plagiarsm check
+								$getPlag = $db -> query("SELECT code,year,nameth,nameen FROM PBL_group WHERE nameth='$nameth' OR nameen='$nameen' ORDER BY year ASC LIMIT 1");
+								if (false && $getPlag -> num_rows) {
+									$readPlag = $getPlag -> fetch_array(MYSQLI_ASSOC);
+									errorMessage(1, "โครงงาน \"$readPlag[nameth]\" ($readPlag[nameen]) ได้มีการทำขึ้นแล้วในปีการศึกษา $readPlag[year] (รหัสโครงงาน $readPlag[code]). กรุณาเลือกชื่อโครงงานอื่น");
+									slog("PBL", "new", "group", $code, "fail", "", "Duplicate");
+								} else {
+									// Check empty group
+									$null_grp = $db -> query("SELECT code FROM PBL_group WHERE mbr1 IS NULL AND $cond");
+									if ($null_grp && $null_grp -> num_rows) {
+										$code = ($null_grp -> fetch_array(MYSQLI_ASSOC))["code"];
+										$success = $db -> query("UPDATE PBL_group SET mbr1=$mbr1,nameth='$nameth',nameen='$nameen',type='$type',adv1=$adv1,adv2=$adv2,adv3=$adv3 WHERE code='$code'");
 									} else {
-										// Check empty group
-										$null_grp = $db -> query("SELECT code FROM PBL_group WHERE mbr1 IS NULL AND $cond");
-										if ($null_grp && $null_grp -> num_rows) {
-											$code = ($null_grp -> fetch_array(MYSQLI_ASSOC))["code"];
-											$success = $db -> query("UPDATE PBL_group SET mbr1=$mbr1,nameth='$nameth',nameen='$nameen',type='$type',adv1=$adv1,adv2=$adv2,adv3=$adv3 WHERE code='$code'");
-										} else {
-											// Generate group code
-											$gengno = $db -> query("SELECT COUNT(code) as cnt FROM PBL_group WHERE $cond"); $gengid = ($gengno -> fetch_array(MYSQLI_ASSOC))["cnt"];
-											$gengde = $year.$grade.(strlen($room)-1?"":"0").$room.(strlen($gengid)-1?"":"0").$gengid;
-											$code = strrev(str_rot13(strtoupper(base_convert($gengde, 10, 36))));
-											$success = $db -> query("INSERT INTO PBL_group (code,year,grade,room,nameth,nameen,type,mbr1,adv1,adv2,adv3) VALUES('$code',$year,$grade,$room,'$nameth','$nameen','$type',$self,$adv1,$adv2,$adv3)");
-										} if ($success) {
-											successState(array("isGrouped" => true, "requireIS" => ($grade == 2 || $grade == 4), "code" => $code, "message" => array(
-												array(0, "Group created successfully.")
-											))); slog("PBL", "new", "group", $code, "pass");
-										} else {
-											errorMessage(3, "Unable to create group. Please try again.");
-											slog("PBL", "new", "group", $code, "fail", "", "InvalidQuery");
-										}
-			} } } } } } }
+										// Generate group code
+										$gengno = $db -> query("SELECT COUNT(code) as cnt FROM PBL_group WHERE $cond"); $gengid = ($gengno -> fetch_array(MYSQLI_ASSOC))["cnt"];
+										$gengde = $year.$grade.(strlen($room)-1?"":"0").$room.(strlen($gengid)-1?"":"0").$gengid;
+										$code = strrev(str_rot13(strtoupper(base_convert($gengde, 10, 36))));
+										$success = $db -> query("INSERT INTO PBL_group (code,year,grade,room,nameth,nameen,type,mbr1,adv1,adv2,adv3) VALUES('$code',$year,$grade,$room,'$nameth','$nameen','$type',$mbr1,$adv1,$adv2,$adv3)");
+									} if ($success) {
+										successState(array("isGrouped" => true, "requireIS" => ($grade == 2 || $grade == 4), "code" => $code, "message" => array(
+											array(0, "Group created successfully.")
+										))); slog("PBL", "new", "group", $code, "pass");
+									} else {
+										errorMessage(3, "Unable to create group. Please try again.");
+										slog("PBL", "new", "group", $code, "fail", "", "InvalidQuery");
+									}
+			} } } } } }
 		} break;
 		case "update": {
 			switch ($command) {
