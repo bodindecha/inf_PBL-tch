@@ -1,9 +1,18 @@
 <?php
 	$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
+	$APP_RootDir = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/"));
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "ตรวจเล่มรายงาน";
 	$header_desc = "ขั้นที่ 2: ประเมินผล";
 	$home_menu = "is-pbl";
+
+	require_once($APP_RootDir."private/script/function/utility.php");
+	require_once($APP_RootDir."private/script/function/database.php");
+	$year = $_SESSION["stif"]["t_year"];
+	$getTimeout = $APP_DB[0] -> query("SELECT value FROM config_sep WHERE year=$year AND name='PBL-cs_M'");
+	$readTimeout = (!$getTimeout || !$getTimeout -> num_rows) ? "" : ($getTimeout -> fetch_array(MYSQLI_ASSOC))["value"];
+	if (strlen($readTimeout) == 19) $readTimeout = date2TH(substr($readTimeout, 0, 10))." เวลา ".str_replace(":", ".", substr($readTimeout, 11, 5))." น.";
+	$APP_DB[0] -> close();
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -243,7 +252,8 @@
 								});
 							}); ctn.append(table+'</tbody></table></div>');
 						});
-						$("main .oform, main .message:where(.minWarn, .features, .timeWarn)").toggle("blind");
+						$("main .oform, main .message:where(.minWarn, .features)").toggle("blind");
+						<?php if (strlen($readTimeout)) { ?>$("main .message.timeWarn").toggle("blind");<?php } ?>
 						$('main select[name^="pr:"]').on("change", function() {
 							var code = this.getAttribute("name").split(":")[1];
 							$('main button[onClick^="PBL.saveGrade(\''+code+'\'"]').removeAttr("disabled");
@@ -436,7 +446,7 @@
 								<hr>
 								<div class="form inline center">ใช้ปุ่ม <button class="yellow icon" disabled=""><i class="material-icons" style="transform: rotate(180deg);">logout</i></button> เพื่อกลับจากหน้าประเมินคะแนนสู่หน้าตารางโครงงาน</div>
 							</center>
-							<center class="timeWarn message yellow" style="display: none;">หลังวันที่ 17 มกราคม 2568 เวลา 23.59 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
+							<center class="timeWarn message yellow" style="display: none;">หลังวันที่ <?php if (strlen($readTimeout)) echo $readTimeout; ?> เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
 							<form class="form oform" onSubmit="return false;" style="display: none;" onSubmit="return false;">
 								<div class="group">
 									<span><i class="material-icons">search</i></span>

@@ -1,14 +1,18 @@
 <?php
 	$dirPWroot = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/")-1);
+	$APP_RootDir = str_repeat("../", substr_count($_SERVER["PHP_SELF"], "/"));
 	require($dirPWroot."resource/hpe/init_ps.php");
 	$header_title = "ตรวจเล่มรายงาน";
 	$header_desc = "ขั้นที่ 1: ผ่าน/ไม่ผ่าน";
 	$home_menu = "is-pbl";
 
-	$timesUp = strtotime(array(
-		2566 => "2024-01-08 23:59:59",
-		2567 => "2025-01-10 23:59:59"
-	)[$_SESSION["stif"]["t_year"]]);
+	require_once($APP_RootDir."private/script/function/utility.php");
+	require_once($APP_RootDir."private/script/function/database.php");
+	$year = $_SESSION["stif"]["t_year"];
+	$getTimeout = $APP_DB[0] -> query("SELECT value FROM config_sep WHERE year=$year AND name='PBL-cs_G'");
+	$readTimeout = (!$getTimeout || !$getTimeout -> num_rows) ? "" : ($getTimeout -> fetch_array(MYSQLI_ASSOC))["value"];
+	if (strlen($readTimeout) == 19) $readTimeout = date2TH(substr($readTimeout, 0, 10))." เวลา ".str_replace(":", ".", substr($readTimeout, 11, 5))." น.";
+	$APP_DB[0] -> close();
 ?>
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -92,7 +96,7 @@
 								$('main button[onClick^="PBL.saveGrade(\''+code+'\'"]').removeAttr("disabled");
 							})
 						} $("main .loading").remove();
-						$("main .message.timeWarn").toggle("blind");
+						<?php if (strlen($readTimeout)) { ?>$("main .message.timeWarn").toggle("blind");<?php } ?>
 					});
 				},
 				loadSubTime = function(event) {
@@ -166,7 +170,7 @@
 						<input type="search" name="find" placeholder="Find..." onInput="PBL.filterByText()">
 					</div>
 				</form>
-				<center class="timeWarn message yellow" style="display: none;">หลังวันที่ 10 มกราคม 2568 เวลา 23.59 น. เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
+				<center class="timeWarn message yellow" style="display: none;">หลังวันที่ <?php if (strlen($readTimeout)) echo $readTimeout; ?> เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
 				<center class="message red" hidden>ขณะนี้หมดเวลาในการพิจารณาผ่าน/ไม่ผ่านโครงงานแล้ว</center>
 				<div class="proj-list message-black" -disabled>
 
