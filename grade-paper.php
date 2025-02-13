@@ -61,8 +61,8 @@
 				var initialize = function() {
 					if (!sv.started) {
 						getList();
-						<?php if (time() < $timesUp) { ?>
-							setTimeout(() => location.reload(), <?=$timesUp - time()?>*1e3);
+						<?php if (strlen($readTimeout) && time() < strtotime($readTimeout)) { ?>
+							setTimeout(() => location.reload(), <?=strtotime($readTimeout) - time()?>*1e3);
 						<?php } ?>
 						sv.started = true;
 					}

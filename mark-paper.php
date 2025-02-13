@@ -226,6 +226,9 @@
 						$(window).on("resize", function() {
 							$("main .wrapper > div").css("--mw", $("main .wrapper").width().toString()+"px");
 						}).trigger("resize");
+						<?php if (strlen($readTimeout) && time() < strtotime($readTimeout)) { ?>
+							setTimeout(() => location.reload(), <?=strtotime($readTimeout) - time()?>*1e3);
+						<?php } ?>
 						sv.started = true;
 					}
 				},
