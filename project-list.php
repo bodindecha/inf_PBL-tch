@@ -110,6 +110,12 @@
 			$(document).ready(function() {
 				// PBL.init();
 				PBL.init();
+				$(document).on("scroll", function() {
+					if (this.scrollingElement.scrollTop < this.scrollingElement.scrollHeight - this.scrollingElement.clientHeight * 1.5) return;
+					var button = document.querySelector("main button.blue[onClick^=\"PBL.load\"]");
+					if (button == null) return;
+					button.click();
+				});
 			});
 			top.USER = "<?=$_SESSION["auth"]["user"]?>";
 			top.USER_ADMIN = !parseInt("<?=(has_perm("PBL") ? 0 : 1)?>");
