@@ -40,8 +40,10 @@
 		};
 		var loadList = function() {
 			app.Util.ajax(cv.API_URL, {act: "list", cmd: "control"}).then(function(dat) {
-				if (!dat || !dat.ifo.length) return app.UI.notify(1, "There are currently no comittee to display.");
-				var holder = 1, buffer= "";
+				if (!dat || !dat.ifo.length) {
+					$("app[name=main] .cmte-list").empty();
+					return app.UI.notify(1, "There are currently no comittee to display.");
+				} var holder = 1, buffer= "";
 				dat.ifo.forEach(es => {
 					buffer += '<tr><td>' + (holder++).toString() + '</td>' +
 						'<td>' + es.name + '</td>' +
@@ -99,11 +101,15 @@
 			d.querySelector("app[name=main] .add-cmte button.blue").disabled = sv.candidate.length >= 50;
 		},
 		assignUser = function() {
-			if (!confirm("Are you sure you want to entitle " + sv.candidate.length + " user(s) listed below to be " + cv.jobName + " ?")) return;
+			var proj_branch = $("app[name=main] .add-cmte select option:checked").val();
+			if (!proj_branch.length) {
+				$("app[name=main] .add-cmte select").focus();
+				return app.UI.notify(1, "Please select a project branch to assign the committee to");
+			} if (!confirm("Are you sure you want to entitle " + sv.candidate.length + " user(s) listed below to be " + cv.jobName + " ?")) return;
 			$("app[name=main] .add-cmte").attr("disabled", "");
 			app.Util.ajax(cv.API_URL, {act: "mod", cmd: "assign", param: {
 				candidate: btoa(sv.candidate.join(", ")),
-				type: $("app[name=main] .add-cmte select option:checked").val()
+				type: proj_branch
 			}}).then(function(dat) {
 				$("app[name=main] .add-cmte").removeAttr("disabled");
 				if (!dat) return;

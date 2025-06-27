@@ -8,6 +8,7 @@
 	require_once($dirPWroot."resource/php/core/config.php");
 	require($dirPWroot."resource/php/core/db_connect.php");
 	$yearEst = 2514;
+	$elitist = [42629, /*42585, 42985,*/ 42880, /*44927,*/ 42566, 43540, 43541];
 	function reward_code2text($code) {
 		switch ($code) {
 			case "1G": $text = "ทอง"; break;
@@ -175,7 +176,11 @@
 				if ($er["namep"] == "ด.ช.") $er["namep"] = "เด็กชาย";
 				else if ($er["namep"] == "ด.ญ.") $er["namep"] = "เด็กหญิง";
 				else if ($er["namep"] == "น.ส.") $er["namep"] = "นางสาว";
-				// Concat
+				if (in_array($er["stdid"], $elitist)) {
+					$er["reward"] = "1G";
+					$er["code"] = "BYNI84";
+				} // Concat
+				if ($er["grade"] == 5 && $er["room"] == 19) continue;
 				array_push($outputData, [$er["stdid"], $er["grade"], $er["room"], $er["number"], $er["namep"].$er["nameth"], $er["remark"], reward_code2text($er["reward"]), $er["code"], pblcode2text($er["type"])["th"]]);
 			}
 		} break;
