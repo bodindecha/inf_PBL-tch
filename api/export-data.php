@@ -76,7 +76,7 @@
 		} break;
 		case "group-member": {
 			$name = "รายชื่อสมาชิกกลุ่ม";
-			$result = $db -> query("SELECT 6-a.gen-$yearEst+$year AS grade,a.room,a.stdid,a.namep,a.namefth,a.namelth,a.number,a.remark,COALESCE(b.code, '') AS code,b.type,(CASE b.nameth WHEN '' THEN b.nameen ELSE b.nameth END) AS proj_name,b.reward FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 ORDER BY a.gen DESC,a.room,b.code,(CASE b.mbr1 WHEN a.stdid THEN 1 ELSE 2 END),a.number");
+			$result = $db -> query("SELECT 6-CAST(a.gen AS INT)-$yearEst+$year AS grade,a.room,a.stdid,a.namep,a.namefth,a.namelth,a.number,a.remark,COALESCE(b.code, '') AS code,b.type,(CASE b.nameth WHEN '' THEN b.nameen ELSE b.nameth END) AS proj_name,b.reward FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 ORDER BY a.gen DESC,a.room,b.code,(CASE b.mbr1 WHEN a.stdid THEN 1 ELSE 2 END),a.number");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["ระดับชั้น", "ห้อง", "รหัสนร.", "คำนำ", "ชื่อจริง", "นามสกุล", "เลขที่", "หมายเหตุ", "รหัสโครงงาน", "สาขาโครงงาน", "หัวข้อโครงงาน", "ระดับรางวัล"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
@@ -96,7 +96,7 @@
 		} break;
 		case "student-score": {
 			$name = "คะแนนนักเรียนแยกส่วน";
-			$result = $db -> query("SELECT a.stdid,6-a.gen-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,(CASE WHEN b.reward IS NULL THEN 0 WHEN b.reward='5N' OR ROUND(SUM(c.total)/COUNT(c.cmte)) IS NULL THEN 2 WHEN ROUND(SUM(c.total)/COUNT(c.cmte))<50 THEN 2 ELSE 3 END) AS score_paper,COALESCE(b.score_poster, 0) AS score_poster,COALESCE(d.score, 0) AS score_ophact,COALESCE(b.code, '') AS code FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year LEFT JOIN PBL_score c ON c.code=b.code LEFT JOIN user_score d ON d.stdid=a.stdid AND d.year=$year AND d.subj='PBL' AND d.field='oph-act' WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 GROUP BY a.stdid ORDER BY grade,a.room,a.number");
+			$result = $db -> query("SELECT a.stdid,6-CAST(a.gen AS INT)-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,(CASE WHEN b.reward IS NULL THEN 0 WHEN b.reward='5N' OR ROUND(SUM(c.total)/COUNT(c.cmte)) IS NULL THEN 2 WHEN ROUND(SUM(c.total)/COUNT(c.cmte))<50 THEN 2 ELSE 3 END) AS score_paper,COALESCE(b.score_poster, 0) AS score_poster,COALESCE(d.score, 0) AS score_ophact,COALESCE(b.code, '') AS code FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year LEFT JOIN PBL_score c ON c.code=b.code LEFT JOIN user_score d ON d.stdid=a.stdid AND d.year=$year AND d.subj='PBL' AND d.field='oph-act' WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 GROUP BY a.stdid ORDER BY grade,a.room,a.number");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["รหัสนร.", "ระดับชั้น", "ห้อง", "เลขที่", "ชื่อ-สกุล", "หมายเหตุ", "คะแนน: เล่มรายงาน", "คะแนน: โปสเตอร์", "คะแนน: เข้าร่วมกิจกรรม", "คะแนนรวม", "รหัสโครงงาน"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
@@ -167,7 +167,7 @@
 		} break;
 		case "cert-student": {
 			$name = "เกียรติบัตรนักเรียน";
-			$result = $db -> query("SELECT a.stdid,6-a.gen-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,b.reward,COALESCE(b.code, '') AS code,COALESCE(b.type, '') AS type FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 ORDER BY grade,a.room,a.number");
+			$result = $db -> query("SELECT a.stdid,6-CAST(a.gen AS INT)-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,b.reward,COALESCE(b.code, '') AS code,COALESCE(b.type, '') AS type FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 ORDER BY grade,a.room,a.number");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["รหัสนร.", "ระดับชั้น", "ห้อง", "เลขที่", "ชื่อ-สกุล", "หมายเหตุ", "ระดับรางวัล", "รหัสโครงงาน", "สาขาโครงงาน"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
