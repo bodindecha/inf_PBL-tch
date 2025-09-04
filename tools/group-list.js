@@ -1,3 +1,11 @@
+
+/**
+ * Library Name: TianTcl - PBL: Group list
+ * Version: 1.2.0
+ * Author: TianTcl
+ * Author URL: https://TianTcl.net
+ * License: MIT
+ */
 const PBL = (function(d) {
 	const cv = {
 		API_URL: "/t/PBL/v2/api/", USER: top.USER,
@@ -34,26 +42,24 @@ const PBL = (function(d) {
 		useFilter: false, loaded: false
 	} };
 	var initialize = function() {
-		if (!sv.started) {
-			sv.started = true;
-			// Fill element
-			$("main .mform [name=grade]").append('<option value="0">ทุกระดับชั้น</option>');
-			$("main .mform [name=room]").append('<option value="0">ทุกห้องเรียน</option>');
-			for (let grade = 1; grade <= 6; grade++) $("main .mform [name=grade]").append(`<option value="${grade}">ม.${grade}</option>`);
-			for (let room = 1; room <= 19; room++) $("main .mform [name=room]").append(`<option value="${room}">${room}</option>`);
-			for (let pos = 0; pos < cv.workFile.length; pos++) $("main .fform [name=files]").append(`<option value="${pos}">${cv.workFile[pos]}</option>`);
-			for (let amt = 1; amt <= 7; amt++) $("main .fform [name=mbr_amt]").append(`<option value="${amt}">${amt}</option>`);
-			$("main .mform, main .fform").on("change", pUI.filter.enableSearch);
-			// Load form
-			seek_param();
-			// Other initialization
-			$(window).on("resize", function() {
-				setTimeout(function() {
-					var infobox = $("main .results > li[open] .extender");
-					infobox.css("height", (infobox.children().first().outerHeight() + infobox.children().last().outerHeight()).toString()+"px");
-				}, 250);
-			});
-		}
+		if (sv.started) return;
+		// Fill element
+		$("main .mform [name=grade]").append('<option value="0">ทุกระดับชั้น</option>');
+		$("main .mform [name=room]").append('<option value="0">ทุกห้องเรียน</option>');
+		for (let grade = 1; grade <= 6; grade++) $("main .mform [name=grade]").append(`<option value="${grade}">ม.${grade}</option>`);
+		for (let room = 1; room <= 19; room++) $("main .mform [name=room]").append(`<option value="${room}">${room}</option>`);
+		for (let pos = 0; pos < cv.workFile.length; pos++) $("main .fform [name=files]").append(`<option value="${pos}">${cv.workFile[pos]}</option>`);
+		for (let amt = 1; amt <= 7; amt++) $("main .fform [name=mbr_amt]").append(`<option value="${amt}">${amt}</option>`);
+		$("main .mform, main .fform").on("change", pUI.filter.enableSearch);
+		// Load form
+		seek_param();
+		// Other initialization
+		$(window).on("resize", function() {
+			setTimeout(function() {
+				var infobox = $("main .results > li[open] .extender");
+				infobox.css("height", (infobox.children().first().outerHeight() + infobox.children().last().outerHeight()).toString()+"px");
+			}, 250);
+		}); sv.started = true;
 	};
 	var seek_param = async function() { if (location.hash.length > 1) {
 		// Extract hashes
@@ -93,6 +99,7 @@ const PBL = (function(d) {
 			for (let pos = 0; pos < cv.workFile.length; pos++)
 				if (data.wf_file&Math.pow(2, pos)) d.querySelector('main .fform [name=files] option[value="'+pos+'"]').selected = true;
 		} if (Object.keys(data).filter(hint => filter.includes(hint)).length) pUI.filter.show();
+		fetch();
 	},
 	getOpts = function() {
 		var data = {
@@ -178,22 +185,20 @@ const PBL = (function(d) {
 			}
 		} return null;
 	},
-	fetch = function(loadNext = 0) {
-		(async function(loadNext) {
+	fetch = async function(loadNext = 0) {
+		if (!loadNext) {
+			getOpts();
+			$('main .mform button[onClick*="PBL.load"]').attr("disabled", "");
+		} else $("main .browser div:last-child > button").attr("disabled", "");
+		await ajax(cv.API_URL+"list", {type: "group", act: null, param: {...sv.opts, loadNext: loadNext}}).then(function(dat) {
 			if (!loadNext) {
-				getOpts();
-				$('main .mform button[onClick*="PBL.load"]').attr("disabled", "");
-			} else $("main .browser div:last-child > button").attr("disabled", "");
-			await ajax(cv.API_URL+"list", {type: "group", act: null, param: {...sv.opts, loadNext: loadNext}}).then(function(dat) {
-				if (!loadNext) {
-					let old = location.pathname+location.search+location.hash;
-					history.replaceState(null, null, location.pathname+location.search+(Object.keys(sv.opts).length ? "#filter="+objEncrypt(sv.opts) : ""));
-					if (old != location.pathname+location.search+location.hash) sys.back.logPageHistory();
-				} else $("main .browser div:last-child > button").removeAttr("disabled");
-				if (dat) render(dat.projects, dat.nextLoad, !loadNext);
-				else if (!loadNext) pUI.filter.enableSearch();
-			});
-		}(loadNext)); return false;
+				let old = location.pathname+location.search+location.hash;
+				history.replaceState(null, null, location.pathname+location.search+(Object.keys(sv.opts).length ? "#filter="+objEncrypt(sv.opts) : ""));
+				if (old != location.pathname+location.search+location.hash) sys.back.logPageHistory();
+			} else $("main .browser div:last-child > button").removeAttr("disabled");
+			if (dat) render(dat.projects, dat.nextLoad, !loadNext);
+			else if (!loadNext) pUI.filter.enableSearch();
+		});
 	},
 	render = async function(projList, nextLoad, clearList = false) {
 		var result = $("main .browser .results"), next = $("main .browser > div:last-child > *");

@@ -108,7 +108,6 @@
 		<!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" /-->
 		<script type="text/javascript">
 			$(document).ready(function() {
-				// PBL.init();
 				PBL.init();
 				$(document).on("scroll", function() {
 					if (this.scrollingElement.scrollTop < this.scrollingElement.scrollHeight - this.scrollingElement.clientHeight * 1.5) return;
@@ -118,31 +117,29 @@
 				});
 			});
 			top.USER = "<?=$_SESSION["auth"]["user"]?>";
-			top.USER_ADMIN = !parseInt("<?=(has_perm("PBL") ? 0 : 1)?>");
+			top.USER_ADMIN = <?php var_export(has_perm("PBL")); ?>;
 			const objEncrypt = obj => {
 				let queryHash = new URLSearchParams(obj);
-				return btoa(queryHash.toString()).replaceAll("=", "").split("m").reverse().join("_").replaceAll("l", "-").split("M").reverse().join("/").replaceAll("0", ".");
-			}, objDecrypt = obj => atob(obj.replaceAll(".", "0").split("/").reverse().join("M").replaceAll("-", "l").split("_").reverse().join("m"));
+				queryHash = btoa(queryHash.toString()).replaceAll("=", "").split("m").reverse().join("_").replaceAll("l", "-").split("M").reverse().join("/").replaceAll("0", ".");
+				if (queryHash.endsWith(".")) queryHash = queryHash.replace(/\.$/, "=");
+				return queryHash;
+			}, objDecrypt = obj => atob(obj.replace("=", "0").replaceAll(".", "0").split("/").reverse().join("M").replaceAll("-", "l").split("_").reverse().join("m"));
 			const pUI = {
 				filter: {
 					toggle: function() {
-						(function() {
-							$("main .fform").toggle("blind");
-							PBL.changeState("useFilter",
-								!$('main .mform button[onClick*="filter.toggle"]').toggleClass("hollow").is(".hollow")
-							);
-						}()); return false;
+						$("main .fform").toggle("blind");
+						PBL.changeState("useFilter",
+							!$('main .mform button[onClick*="filter.toggle"]').toggleClass("hollow").is(".hollow")
+						);
 					}, show: function() {
 						$("main .fform").show();
 						$('main .mform button[onClick*="filter.toggle"]').removeClass("hollow")
 						PBL.changeState("useFilter", true);
 					}, reset: function(close) {
-						(function() {
-							document.querySelector("main .fform").reset();
-							history.replaceState(null, null, location.pathname+location.search);
-							if (close) pUI.filter.toggle();
-							pUI.filter.enableSearch();
-						}()); return false;
+						document.querySelector("main .fform").reset();
+						history.replaceState(null, null, location.pathname+location.search);
+						if (close) pUI.filter.toggle();
+						pUI.filter.enableSearch();
 					}, update: function() {
 						var finder = $("main .oform [name=find]").val().trim().replaceAll("เเ", "แ");
 						w3.filterHTML("main .browser .results", "li", finder);
@@ -160,7 +157,7 @@
 			};
 		</script>
 		<script type="text/javascript" src="/t/PBL/v2/tools/PBL-teacher.min.js"></script>
-		<script type="text/javascript" src="/t/PBL/v2/tools/group-list.min.js?d=2024-12-29"></script>
+		<script type="text/javascript" src="/t/PBL/v2/tools/group-list.min.js?d=2025-08-29"></script>
 		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/w3.min.js"></script>
 		<script type="text/javascript" src="https://cdn.TianTcl.net/static/script/lib/jQuery/bez.min.js"></script>
 	</head>
@@ -178,10 +175,10 @@
 						<span>ห้อง</span>
 						<select name="room"></select>
 					</div>
-					<button class="gray hollow" onClick="return pUI.filter.toggle()" data-title="Filter">
+					<button class="gray hollow" onClick="pUI.filter.toggle(); return false;" data-title="Filter">
 						<i class="material-icons">filter_list</i>
 					</button>
-					<button class="blue" onClick="return PBL.load()">ค้นหา</button>
+					<button class="blue" onClick="PBL.load(); return false;">ค้นหา</button>
 					<?php if (has_perm("PBL")) echo '<button disabled class="green" onClick="PBL.()">ดาวน์โหลดรายชื่อ</button>'; ?>
 				</form>
 				<form class="form fform inline --message default" onSubmit="return false" style="display: none;">
@@ -254,8 +251,8 @@
 						</select>
 					</div>
 					<div class="group">
-						<button class="orange hollow" onClick="return pUI.filter.reset(false)" data-title="Reset" type="reset"><i class="material-icons">delete_sweep</i></button>
-						<button class="red hollow" onClick="return pUI.filter.reset(true)" data-title="Clear" type="reset"><i class="material-icons">backspace</i></button>
+						<button class="orange hollow" onClick="pUI.filter.reset(false); return false;" data-title="Reset" type="reset"><i class="material-icons">delete_sweep</i></button>
+						<button class="red hollow" onClick="pUI.filter.reset(true); return false;" data-title="Clear" type="reset"><i class="material-icons">backspace</i></button>
 					</div>
 				</form>
 				<form class="form oform" onSubmit="return false;" style="display: none;">
