@@ -7,7 +7,7 @@
 	require_once($APP_RootDir."private/script/lib/TianTcl/various.php");
 	if (!has_perm("PBL")) TianTcl::http_response_code(901);
 
-	require($APP_RootDir."public_html/resource/php/core/config.php");
+	require($APP_RootDir."$APP_CONST[publicDir]/resource/php/core/config.php");
 	$APP_PAGE -> print -> head();
 ?>
 <style type="text/css">

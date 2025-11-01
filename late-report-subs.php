@@ -4,7 +4,7 @@
 	$header["title"] = "Late report list";
 	$header["desc"] = "Projects that report late";
 
-	require_once($APP_RootDir."public_html/resource/php/core/config.php");
+	require_once($APP_RootDir."$APP_CONST[publicDir]/resource/php/core/config.php");
 	$APP_PAGE -> print -> head();
 ?>
 <style type="text/css">

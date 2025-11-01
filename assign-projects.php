@@ -5,7 +5,7 @@
 	$header["desc"] = "Assign projects to commitee for marking and grading";
 
 	require_once($APP_RootDir."private/script/lib/TianTcl/various.php");
-	require_once($APP_RootDir."public_html/resource/php/core/config.php");
+	require_once($APP_RootDir."$APP_CONST[publicDir]/resource/php/core/config.php");
 	require($APP_RootDir."private/script/function/database.php");
 	function is_branch_head() {
 		global $APP_USER, $APP_DB;

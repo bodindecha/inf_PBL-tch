@@ -10,7 +10,7 @@
 	if (empty($APP_USER)) API::errorMessage(3, "You are not signed-in. Please reload and try again."); else
 	switch (API::$action) {
 		case "list": {
-			require($APP_RootDir."public_html/resource/php/core/config.php");
+			require($APP_RootDir."$APP_CONST[publicDir]/resource/php/core/config.php");
 			switch (API::$command) {
 				case "control": {
 					$get = $APP_DB[0] -> query("SELECT a.cmteid,a.type,a.allow,a.isHead,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS namefull FROM PBL_cmte a INNER JOIN user_t b ON a.tchr=b.namecode WHERE a.cmteid>0 AND a.year=$year ORDER BY a.type,b.namefth,b.namelth");
