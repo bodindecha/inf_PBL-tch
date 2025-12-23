@@ -9,7 +9,7 @@
 			switch ($command) {
 				case "title": {
 					$code = escapeSQL($attr["code"]);
-					$get = $db -> query("SELECT a.nameth,a.nameen,a.type,a.adv1,a.adv2,a.adv3,(CASE WHEN a.reward IS NULL THEN NULL WHEN a.reward IN ('5N', '0P') OR ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score_paper,a.score_poster,c.score AS score_activity FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code LEFT JOIN user_score c ON c.stdid=a.mbr1 AND c.year=a.year AND c.subj='PBL' AND c.field='oph-act' WHERE a.code='$code' GROUP BY b.code");
+					$get = $db -> query("SELECT a.nameth,a.nameen,a.type,a.adv1,a.adv2,a.adv3,a.reward,(CASE WHEN a.reward IS NULL THEN NULL WHEN a.reward IN ('5N', '0P') OR ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score_paper,a.score_poster,c.score AS score_activity FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code LEFT JOIN user_score c ON c.stdid=a.mbr1 AND c.year=a.year AND c.subj='PBL' AND c.field='oph-act' WHERE a.code='$code' GROUP BY b.code");
 					if (!$get) {
 						errorMessage(3, "Error loading your data. Please try again.");
 						slog("PBL", "load", "info", $code, "fail", "", "InvalidQuery");
@@ -18,7 +18,13 @@
 						slog("PBL", "load", "info", $code, "fail", "", "NotExisted");
 					} else {
 						$read = $get -> fetch_array(MYSQLI_ASSOC);
-						$read["score"] = (int)$read["score_paper"] + (int)$read["score_poster"] + (int)$read["score_activity"];
+							$read["flag_plag"] = $read["reward"] == "6P";
+							unset($read["reward"]);
+							if ($read["flag_plag"]) {
+								$read["score_paper"] = 0;
+								$read["score_poster"] = 0;
+								$read["score_activity"] = 0;
+							} $read["score"] = (int)$read["score_paper"] + (int)$read["score_poster"] + (int)$read["score_activity"];
 						successState($read);
 					}
 				} break;

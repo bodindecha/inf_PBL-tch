@@ -17,6 +17,7 @@
 			case "4M": $text = "ชมเชย"; break;
 			case "5N": $text = "เข้าร่วม"; break;
 			case "0P": $text = "ผ่านเกณฑ์"; break;
+			case "6P": $text = "คัดลอก"; break;
 			default: $text = "-"; break;
 		} return $text;
 	}
@@ -96,12 +97,16 @@
 		} break;
 		case "student-score": {
 			$name = "คะแนนนักเรียนแยกส่วน";
-			$result = $db -> query("SELECT a.stdid,6-CAST(a.gen AS INT)-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,(CASE WHEN b.reward IS NULL THEN 0 WHEN b.reward='5N' OR ROUND(SUM(c.total)/COUNT(c.cmte)) IS NULL THEN 2 WHEN ROUND(SUM(c.total)/COUNT(c.cmte))<50 THEN 2 ELSE 3 END) AS score_paper,COALESCE(b.score_poster, 0) AS score_poster,COALESCE(d.score, 0) AS score_ophact,COALESCE(b.code, '') AS code FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year LEFT JOIN PBL_score c ON c.code=b.code LEFT JOIN user_score d ON d.stdid=a.stdid AND d.year=$year AND d.subj='PBL' AND d.field='oph-act' WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 GROUP BY a.stdid ORDER BY grade,a.room,a.number");
+			$result = $db -> query("SELECT a.stdid,6-CAST(a.gen AS INT)-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,b.reward,(CASE WHEN b.reward IS NULL THEN 0 WHEN b.reward='5N' OR ROUND(SUM(c.total)/COUNT(c.cmte)) IS NULL THEN 2 WHEN ROUND(SUM(c.total)/COUNT(c.cmte))<50 THEN 2 ELSE 3 END) AS score_paper,COALESCE(b.score_poster, 0) AS score_poster,COALESCE(d.score, 0) AS score_ophact,COALESCE(b.code, '') AS code FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year LEFT JOIN PBL_score c ON c.code=b.code LEFT JOIN user_score d ON d.stdid=a.stdid AND d.year=$year AND d.subj='PBL' AND d.field='oph-act' WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 GROUP BY a.stdid ORDER BY grade,a.room,a.number");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["รหัสนร.", "ระดับชั้น", "ห้อง", "เลขที่", "ชื่อ-สกุล", "หมายเหตุ", "คะแนน: เล่มรายงาน", "คะแนน: โปสเตอร์", "คะแนน: เข้าร่วมกิจกรรม", "คะแนนรวม", "รหัสโครงงาน"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
 				// Modify
-				$totalScore = intval($er["score_paper"]) + intval($er["score_poster"]) + intval($er["score_ophact"]);
+				if ($er["reward"] == "6P") { // Plagiarized
+					$er["score_paper"] = 0;
+					$er["score_poster"] = 0;
+					$er["score_ophact"] = 0;
+				} $totalScore = (int)$er["score_paper"] + (int)$er["score_poster"] + (int)$er["score_ophact"];
 				// Concat
 				array_push($outputData, [$er["stdid"], $er["grade"], $er["room"], $er["number"], prefixcode2text($er["namep"])["th"].$er["nameth"], $er["remark"], $er["score_paper"], $er["score_poster"], $er["score_ophact"], $totalScore, $er["code"]]);
 			}
@@ -145,7 +150,7 @@
 		} break;
 		case "project-result": {
 			$name = "ผลและคะแนนเล่มรายงาน";
-			$result = $db -> query("SELECT a.grade,a.room,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.type,(CASE WHEN a.reward='5N' THEN 'ไม่ผ่าน' WHEN a.reward IS NULL THEN '-' ELSE 'ผ่าน' END) AS evalG,COALESCE(ROUND(SUM(b.total)/COUNT(b.cmte)*100)/100, '') AS evalM,(CASE WHEN a.reward IS NULL THEN 0 WHEN a.reward='5N' THEN 2 WHEN SUM(b.total)/COUNT(b.cmte) IS NULL THEN '' WHEN SUM(b.total)/COUNT(b.cmte)<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON a.code=b.code WHERE a.year=$year AND a.mbr1 IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.room,a.code");
+			$result = $db -> query("SELECT a.grade,a.room,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.type,(CASE WHEN a.reward='5N' THEN 'ไม่ผ่าน' WHEN a.reward='6P' THEN 'คัดลอก' WHEN a.reward IS NULL THEN '-' ELSE 'ผ่าน' END) AS evalG,COALESCE(ROUND(SUM(b.total)/COUNT(b.cmte)*100)/100, '') AS evalM,(CASE WHEN a.reward IS NULL OR a.reward='6P' THEN 0 WHEN a.reward='5N' THEN 2 WHEN SUM(b.total)/COUNT(b.cmte) IS NULL THEN '' WHEN SUM(b.total)/COUNT(b.cmte)<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON a.code=b.code WHERE a.year=$year AND a.mbr1 IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.room,a.code");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["ระดับชั้น", "ห้อง", "รหัสโครงงาน", "หัวข้อโครงงาน", "สาขาโครงงาน", "ผลประเมิน", "คะแนนเฉลี่ย", "คิดเป็น"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {

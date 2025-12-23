@@ -109,34 +109,33 @@
 					$result = array();
 					function appendData($get_groups, $readperm) {
 						global $result;
-						if ($get_groups -> num_rows) {
-							$category = array(); $grade = "0"; $grades = array();
-							while ($readgroup = $get_groups -> fetch_assoc()) {
-								if ($readgroup["grade"]<>$grade) {
-									if (count($grades)) {
-										$category[$grade] = $grades;
-										$grades = array();
-									} $grade = $readgroup["grade"];
-								} $markers = array_values(array_filter(array($readgroup["mrker1"], $readgroup["mrker2"], $readgroup["mrker3"], $readgroup["mrker4"], $readgroup["mrker5"])));
-								for ($marker = 0; $marker < count($markers); $marker++) $markers[$marker] = TianTcl::encrypt("PBL-".$markers[$marker]."cmte", PBL_ENC_KEY, 2);
-								array_push($grades, array(
-									"code" => $readgroup["code"],
-									"name" => $readgroup["name"],
-									"cmte" => $readgroup["grader"] == null ? null : TianTcl::encrypt("PBL-".$readgroup["grader"]."cmte", PBL_ENC_KEY, 2),
-									"asgn" => $markers,
-									"step" => intval($readgroup["round"]),
-								));
-							} if (count($grades)) $category[$grade] = $grades;
-							if (count($category)) $result[$readperm] = $category;
-						}
+						if (!$get_groups -> num_rows) return;
+						$category = array(); $grade = "0"; $grades = array();
+						while ($readgroup = $get_groups -> fetch_assoc()) {
+							if ($readgroup["grade"]<>$grade) {
+								if (count($grades)) {
+									$category[$grade] = $grades;
+									$grades = array();
+								} $grade = $readgroup["grade"];
+							} $markers = array_values(array_filter(array($readgroup["mrker1"], $readgroup["mrker2"], $readgroup["mrker3"], $readgroup["mrker4"], $readgroup["mrker5"])));
+							for ($marker = 0; $marker < count($markers); $marker++) $markers[$marker] = TianTcl::encrypt("PBL-".$markers[$marker]."cmte", PBL_ENC_KEY, 2);
+							array_push($grades, array(
+								"code" => $readgroup["code"],
+								"name" => $readgroup["name"],
+								"cmte" => $readgroup["grader"] == null ? null : TianTcl::encrypt("PBL-".$readgroup["grader"]."cmte", PBL_ENC_KEY, 2),
+								"asgn" => $markers,
+								"step" => intval($readgroup["round"]),
+							));
+						} if (count($grades)) $category[$grade] = $grades;
+						if (count($category)) $result[$readperm] = $category;
 					}
 					if ($isPBLmaster) foreach (str_split("ABCDEFGHIJKLM") as $readperm) {
-						$get_groups = $db -> query("SELECT code,grade,(CASE nameth WHEN '' THEN nameen ELSE nameth END) AS name,grader,mrker1,mrker2,mrker3,mrker4,mrker5,(CASE WHEN (NOT reward='5N' AND reward IS NOT NULL) THEN 2 ELSE 1 END) AS round FROM PBL_group WHERE mbr1 IS NOT NULL AND type='$readperm' AND year=$year GROUP BY code ORDER BY grade,code");
+						$get_groups = $db -> query("SELECT code,grade,(CASE nameth WHEN '' THEN nameen ELSE nameth END) AS name,grader,mrker1,mrker2,mrker3,mrker4,mrker5,(CASE WHEN NOT reward IN('5N', '6P') AND reward IS NOT NULL THEN 2 ELSE 1 END) AS round FROM PBL_group WHERE mbr1 IS NOT NULL AND type='$readperm' AND year=$year GROUP BY code ORDER BY grade,code");
 						appendData($get_groups, $readperm);
 					} else {
 						$get_perm = $db -> query("SELECT cmteid,type FROM PBL_cmte WHERE tchr='$self' AND year=$year AND allow='Y' AND isHead='Y'");
 						if ($get_perm -> num_rows) while ($readperm = $get_perm -> fetch_assoc()) {
-							$get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.grader,a.mrker1,a.mrker2,a.mrker3,a.mrker4,a.mrker5,(CASE WHEN (NOT a.reward='5N' AND a.reward IS NOT NULL) THEN 2 ELSE 1 END) AS round FROM PBL_group a INNER JOIN PBL_cmte b ON b.cmteid=$readperm[cmteid] WHERE a.mbr1 IS NOT NULL AND a.type='$readperm[type]' AND a.year=$year ORDER BY a.grade,a.code");
+							$get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.grader,a.mrker1,a.mrker2,a.mrker3,a.mrker4,a.mrker5,(CASE WHEN NOT a.reward IN('5N', '6P') AND a.reward IS NOT NULL THEN 2 ELSE 1 END) AS round FROM PBL_group a INNER JOIN PBL_cmte b ON b.cmteid=$readperm[cmteid] WHERE a.mbr1 IS NOT NULL AND a.type='$readperm[type]' AND a.year=$year ORDER BY a.grade,a.code");
 							appendData($get_groups, $readperm["type"]);
 						} else if ($get_perm) errorMessage(1, "You are not assigned as a head of any project type");
 						else errorMessage(3, "Unable to read permission");

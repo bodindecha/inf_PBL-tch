@@ -85,7 +85,7 @@
 						}
 					}
 					if ($isPBLmaster) foreach (str_split("ABCDEFGHIJKLM") as $readperm) {
-						$get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.fileStatus&512 AS sent,c.total AS mark,(SELECT COUNT(d.cmte) FROM PBL_score d WHERE d.code=a.code) AS aogc FROM PBL_group a LEFT JOIN PBL_cmte b ON b.year=$year AND b.tchr='$self' LEFT JOIN PBL_score c ON a.code=c.code AND c.cmte=b.cmteid WHERE a.mbr1 IS NOT NULL AND a.type='$readperm' AND a.year=$year AND NOT a.reward='5N' AND a.reward IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.code");
+						$get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.fileStatus&512 AS sent,c.total AS mark,(SELECT COUNT(d.cmte) FROM PBL_score d WHERE d.code=a.code) AS aogc FROM PBL_group a LEFT JOIN PBL_cmte b ON b.year=$year AND b.tchr='$self' LEFT JOIN PBL_score c ON a.code=c.code AND c.cmte=b.cmteid WHERE a.mbr1 IS NOT NULL AND a.type='$readperm' AND a.year=$year AND NOT a.reward IN('5N', '6P') AND a.reward IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.code");
 						appendData($get_groups, $readperm);
 					} else {
 						$get_perm = $db -> query("SELECT cmteid,type,isHead FROM PBL_cmte WHERE allow='Y' AND tchr='$self' AND year=$year");
@@ -97,7 +97,7 @@
 								if (strlen($readTimeout) && date("Y-m-d H:i:s") > $readTimeout && $readperm["isHead"] <> "Y") {
 									$timedout = true;
 									continue;
-								} $get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.fileStatus&512 AS sent,c.total AS mark,(SELECT COUNT(d.cmte) FROM PBL_score d WHERE d.code=a.code) AS aogc FROM PBL_group a INNER JOIN PBL_cmte b ON b.cmteid=$readperm[cmteid] LEFT JOIN PBL_score c ON a.code=c.code AND c.cmte=b.cmteid WHERE a.mbr1 IS NOT NULL AND a.type='$readperm[type]' AND a.year=$year AND NOT a.reward='5N' AND a.reward IS NOT NULL AND (b.cmteid IN(mrker1, mrker2, mrker3, mrker4, mrker5) OR CONCAT(COALESCE(mrker1, ''), COALESCE(mrker2, ''), COALESCE(mrker3, ''), COALESCE(mrker4, ''), COALESCE(mrker5, ''))='' OR b.isHead='Y') ORDER BY a.grade,a.code");
+								} $get_groups = $db -> query("SELECT a.code,a.grade,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.fileStatus&512 AS sent,c.total AS mark,(SELECT COUNT(d.cmte) FROM PBL_score d WHERE d.code=a.code) AS aogc FROM PBL_group a INNER JOIN PBL_cmte b ON b.cmteid=$readperm[cmteid] LEFT JOIN PBL_score c ON a.code=c.code AND c.cmte=b.cmteid WHERE a.mbr1 IS NOT NULL AND a.type='$readperm[type]' AND a.year=$year AND NOT a.reward IN('5N', '6P') AND a.reward IS NOT NULL AND (b.cmteid IN(mrker1, mrker2, mrker3, mrker4, mrker5) OR CONCAT(COALESCE(mrker1, ''), COALESCE(mrker2, ''), COALESCE(mrker3, ''), COALESCE(mrker4, ''), COALESCE(mrker5, ''))='' OR b.isHead='Y') ORDER BY a.grade,a.code");
 								appendData($get_groups, $readperm["type"]);
 							} 
 						} else if ($get_perm) errorMessage(1, "You are not assigned to mark any of the projects");
@@ -145,7 +145,7 @@
 							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 70 THEN '3B'
 							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 60 THEN '4M'
 							WHEN a.reward IN ('1G', '2S', '3B', '4M') THEN '0P' ELSE a.reward
-						END) AS new_reward FROM PBL_group a WHERE a.year=$year AND a.reward IS NOT NULL AND a.reward != '5N' ORDER BY a.grade,a.room,a.code");
+						END) AS new_reward FROM PBL_group a WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P') ORDER BY a.grade,a.room,a.code");
 						if (!$get) {
 							errorMessage(3, "There's an error generating preview");
 							slog("PBL", "load", "reward", "", "fail", "", "InvalidQuery");
@@ -161,6 +161,7 @@
 									case "4M": $text = "ชมเชย"; break;
 									case "5N": $text = "เข้าร่วม"; break;
 									case "0P": $text = "ผ่านเกณฑ์"; break;
+									case "6P": $text = "คัดลอก"; break;
 									default: $text = "-"; break;
 								} return $text;
 							} $changes = array(); $grade = 0;
@@ -198,7 +199,7 @@
 							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 70 AND 80 THEN '2S'
 							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 70 THEN '3B'
 							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 60 THEN '4M'
-						ELSE a.reward END),a.lastupdate=a.lastupdate WHERE a.year=$year AND a.reward IS NOT NULL AND a.reward != '5N'");
+						ELSE a.reward END),a.lastupdate=a.lastupdate WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P')");
 						if ($success) {
 							successState();
 							slog("PBL", "edit", "reward", "", "pass");

@@ -83,7 +83,15 @@
 											// table += '<div class="group spread"><a role="button" class="cyan small" href="/t/PBL/v2/preview?file=report-all&code='+ep["code"]+'" onClick="PBL.viewfile(\''+ep["code"]+'\', \''+ep["time"]+'\', event)" target="_blank" draggable="false"'+(ep["time"].length?' data-title="'+ep["time"]+'"':"")+'>เปิดไฟล์</a>';
 											table += '<div class="group spread"><a role="button" class="cyan small" href="/t/PBL/v2/preview?file=report-all&code='+ep["code"]+'" '+cv.controlField+'="'+ep["code"]+'" target="_blank" draggable="false">เปิดไฟล์</a>';
 											if (["1G", "2S", "3B", "4M"].includes(ep["rank"])) table += '<div class="center"><button class="blue small no-action pill" disabled>มีผลประเมินแล้ว</button></div>';
-											else table += '<div class="group right"><select name="pr:'+ep["code"]+'"><option value="null" '+(ep["rank"]==null?"selected":"")+'>รอประเมิน</option>'+(ep["sent"]?'<option value="0P" '+(ep["rank"]=="0P"?"selected":"")+'>ผ่าน</option>':'')+'<option value="5N" '+(ep["rank"]=="5N"?"selected":"")+'>ไม่ผ่าน</option></select><button class="green small" onClick="PBL.saveGrade(\''+ep["code"]+'\', \''+ep["rank"]+'\')" disabled>บันทึก</button></div>';
+											else table += `<div class="group right">
+												<select name="pr:${ep["code"]}">
+													<option value="null" ${ep["rank"] == null?"selected":""}'>รอประเมิน</option>
+													${ep["sent"] ? `<option value="0P" ${ep["rank"] == "0P"?"selected":""}>ผ่าน</option>` : ''}
+													<option value="5N" ${ep["rank"] == "5N"?"selected":""}>ไม่ผ่าน</option>
+													${ep["sent"] ? `<option value="6P" ${ep["rank"] == "6P"?"selected":""}>คัดลอก*</option>` : ''}
+												</select>
+												<button class="green small" onClick="PBL.saveGrade('${ep["code"]}', '${ep["rank"]}')" disabled>บันทึก</button>
+											</div>`;
 											table += '</div>';
 										} table += '</div></td></tr>';
 									});
@@ -161,19 +169,18 @@
 		<main shrink="<?php echo($_COOKIE['sui_open-nt'])??"false"; ?>">
 			<div class="container">
 				<h2><?=$header_title.$header_desc?></h2>
-				<div class="loading medium">
-					<img src="/resource/images/widget-load_spinner.gif" />
-				</div>
+				<center class="timeWarn message yellow" style="display: none;">หลังวันที่ <?php if (strlen($readTimeout)) echo $readTimeout; ?> เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
+				<center class="message red" hidden>ขณะนี้หมดเวลาในการพิจารณาผ่าน/ไม่ผ่านโครงงานแล้ว</center>
+				<center class="message blue">ผลการประเมิน "คัดลอก" หมายถึง โครงงานเป็นโครงงานที่คัดลอกโครงงานอื่นทั้งภายในโรงเรียนหรือภายนอกมา หรือนำมางานเก่ามาส่ง</center>
 				<form class="form oform" onSubmit="return false;" style="display: none;">
 					<div class="group">
 						<span><i class="material-icons">search</i></span>
 						<input type="search" name="find" placeholder="Find..." onInput="PBL.filterByText()">
 					</div>
 				</form>
-				<center class="timeWarn message yellow" style="display: none;">หลังวันที่ <?php if (strlen($readTimeout)) echo $readTimeout; ?> เป็นต้นไป<br>ท่านอาจเห็นจำนวนโครงงานที่สามารถตรวจได้จำนวนลดลงหรือไม่เห็นโครงงานใดเลย</center>
-				<center class="message red" hidden>ขณะนี้หมดเวลาในการพิจารณาผ่าน/ไม่ผ่านโครงงานแล้ว</center>
-				<div class="proj-list message-black" -disabled>
-
+				<div class="proj-list message-black"></div>
+				<div class="loading medium">
+					<img src="/resource/images/widget-load_spinner.gif" />
 				</div>
 			</div>
 		</main>
