@@ -83,7 +83,7 @@
 					$code = escapeSQL($attr);
 					$get = $db -> query("SELECT LEFT(a.time, 19) AS time,CAST(a.time AS DATE) > c.value AS isLate FROM log_action a JOIN config_sys b ON b.name='t_year' INNER JOIN config_sep c ON c.year=b.value AND c.name='PBL-dd_F' WHERE a.app='PBL' AND a.cmd='new' AND a.act='file' AND a.data='$code: report-all' AND a.val='pass' ORDER BY a.time DESC LIMIT 1");
 					if (!$get) errorMessage(3, "Unable to load submission time");
-					else if ($get -> num_rows <> 1) errorMessage(3, "Unable to get submission time"); 
+					else if ($get -> num_rows <> 1) errorMessage(3, "Unable to get submission time");
 					else {
 						$read = $get -> fetch_array(MYSQLI_ASSOC);
 						$read["time"] = !empty($read["time"]) ? date("ส่งเมื่อวันที่ d/m/Y เวลา H:i น.", strtotime($read["time"])) : "";
@@ -170,10 +170,10 @@
 						$cmte = $read["cmteid"];
 						$note = htmlspecialchars($note);
 						if (empty($read["refID"])) {
-							$success = $db -> query("INSERT INTO PBL_score (cmte,code,raw,total,note,ip) VALUES($cmte,'$code','$raw',$total,'$note','$ip')");
+							$success = $db -> query("INSERT INTO PBL_score (cmte,code,raw,total,note) VALUES($cmte,'$code','$raw',$total,'$note')");
 							$action = "new";
 						} else {
-							$success = $db -> query("UPDATE PBL_score SET cmte=$cmte,code='$code',raw='$raw',total=$total,note='$note',edit=edit+1,ip='$ip' WHERE refID=".$read["refID"]);
+							$success = $db -> query("UPDATE PBL_score SET cmte=$cmte,code='$code',raw='$raw',total=$total,note='$note',edit=edit+1 WHERE refID=".$read["refID"]);
 							$action = "edit";
 						} if ($success) {
 							successState();
