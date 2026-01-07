@@ -245,10 +245,10 @@
 						$get_perm = $APP_DB[0] -> query("SELECT a.cmteid FROM PBL_cmte a INNER JOIN PBL_group b ON b.code='$project' AND a.type=b.type WHERE a.tchr='$APP_USER' AND a.year=$year AND a.allow='Y' AND a.isHead='Y'");
 						if (!$get_perm) {
 							API::errorMessage(3, "Unable to check permission");
-							syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte", false, "", "InvalidGetQuery");
+							syslog_a(null, "PBL", "revoke", "assignee", $project, false, "", "InvalidGetQuery");
 						} else if (!$get_perm -> num_rows) {
 							API::errorMessage(3, "You don't have permission to perform this action");
-							syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte", false, "", "NoPermission");
+							syslog_a(null, "PBL", "revoke", "assignee", $project, false, "", "NoPermission");
 						} else goto hasPerm5;
 					} else {
 						hasPerm5:
@@ -257,8 +257,8 @@
 						$success = $APP_DB[0] -> query("UPDATE PBL_group SET lastupdate=lastupdate$replace_query WHERE code='$project'");
 						if ($success) {
 							API::successState();
-							syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte");
-						} else syslog_a(null, "PBL", "revoke", "assignee", "$project: $cmte", false, "", "InvalidQuery");
+							syslog_a(null, "PBL", "revoke", "assignee", $project);
+						} else syslog_a(null, "PBL", "revoke", "assignee", $project, false, "", "InvalidQuery");
 					}
 				break; }
 				default: API::errorMessage(1, "Invalid command"); break;
