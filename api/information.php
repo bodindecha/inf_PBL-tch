@@ -8,7 +8,7 @@
 		case "group": {
 			$code = escapeSQL($command);
 			// No COALESCE on score -> only show when all is graded
-			$get = $db -> query("SELECT a.grade,a.room,a.lastupdate,a.type,a.mbr1,a.mbr2,a.mbr3,a.mbr4,a.mbr5,a.mbr6,a.mbr7,a.adv1,a.adv2,a.adv3,a.reward,a.score_poster+c.score+(CASE WHEN a.reward IS NULL THEN NULL WHEN a.reward IN ('5N', '0P') OR ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code LEFT JOIN user_score c ON c.stdid=a.mbr1 AND c.year=a.year AND c.subj='PBL' AND c.field='oph-act' WHERE a.code='$code' GROUP BY b.code");
+			$get = $db -> query("SELECT a.grade,a.room,a.lastupdate,a.type,a.mbr1,a.mbr2,a.mbr3,a.mbr4,a.mbr5,a.mbr6,a.mbr7,a.adv1,a.adv2,a.adv3,a.reward,a.score_poster+c.score+(CASE WHEN a.reward IS NULL THEN NULL WHEN a.reward IN ('5N', '0P') OR ROUND(SUM(b.total)/COUNT(b.cmte))<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON b.code=a.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' LEFT JOIN user_score c ON c.stdid=a.mbr1 AND c.year=a.year AND c.subj='PBL' AND c.field='oph-act' WHERE a.code='$code' GROUP BY b.code");
 			if (!$get) {
 				errorMessage(3, "Error loading group's information. Please try again.");
 				slog("PBL", "load", "manifest", $code, "fail", "", "InvalidQuery");

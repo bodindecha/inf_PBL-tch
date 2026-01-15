@@ -107,13 +107,16 @@
 				} break;
 				case "graded-committee": {
 					$code = escapeSQL($attr);
-					$get = $db -> query("SELECT c.namep,c.namefth,c.namelth FROM PBL_score a INNER JOIN PBL_cmte b ON a.cmte=b.cmteid INNER JOIN user_t c ON b.tchr=c.namecode WHERE a.code='$code' ORDER BY a.time");
+					$get = $db -> query("SELECT c.namep,c.namefth,c.namelth,b.allow FROM PBL_score a INNER JOIN PBL_cmte b ON a.cmte=b.cmteid INNER JOIN user_t c ON b.tchr=c.namecode WHERE a.code='$code' ORDER BY a.time");
 					if (!$get) errorMessage(3, "Unable to load graded committee names");
 					else if (!$get -> num_rows) errorMessage(3, "Unable to get graded committee names"); 
 					else {
-						$logc = array(); while ($read = $get -> fetch_assoc())
-							array_push($logc, prefixcode2text($read["namep"])["th"].$read["namefth"]."  ".$read["namelth"]);
-						successState($logc);
+						$logc = [];
+						while ($read = $get -> fetch_assoc()) {
+							$display = prefixcode2text($read["namep"])["th"].$read["namefth"]."  ".$read["namelth"];
+							if ($isPBLmaster && $read["allow"] <> "Y") $display = "<strike>$display</strike>";
+							array_push($logc, $display);
+						} successState($logc);
 					}
 				} break;
 				default: errorMessage(1, "Invalid command"); break;
@@ -139,11 +142,12 @@
 						errorMessage(3, "You don't have permission to view this data");
 						slog("PBL", "load", "reward", "", "fail", "", "Unauthorized");
 					} else {
-						$get = $db -> query("SELECT a.code,a.grade,a.room,a.type,(SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) AS score,a.reward,(CASE
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 80 AND 100 THEN '1G'
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 70 AND 80 THEN '2S'
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 70 THEN '3B'
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 60 THEN '4M'
+						$scoreSrc = "FROM PBL_score b WHERE b.code=a.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' GROUP BY b.code";
+						$get = $db -> query("SELECT a.code,a.grade,a.room,a.type,(SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 $scoreSrc) AS score,a.reward,(CASE
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 80 AND 100 THEN '1G'
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 70 AND 80 THEN '2S'
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 60 AND 70 THEN '3B'
+							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 50 AND 60 THEN '4M'
 							WHEN a.reward IN ('1G', '2S', '3B', '4M') THEN '0P' ELSE a.reward
 						END) AS new_reward FROM PBL_group a WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P') ORDER BY a.grade,a.room,a.code");
 						if (!$get) {
@@ -194,11 +198,12 @@
 						errorMessage(2, "Token mismatched. Please try again");
 						slog("PBL", "edit", "reward", "", "fail", "", "InvalidToken");
 					} else {
+						$scoreGet = "(SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' GROUP BY b.code)";
 						$success = $db -> query("UPDATE PBL_group a SET a.lastupdate=a.lastupdate,a.reward=(CASE
-							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 80 AND 100 THEN '1G'
-							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 70 AND 80 THEN '2S'
-							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 60 AND 70 THEN '3B'
-							WHEN (SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code GROUP BY b.code) BETWEEN 50 AND 60 THEN '4M'
+							WHEN $scoreGet BETWEEN 80 AND 100 THEN '1G'
+							WHEN $scoreGet BETWEEN 70 AND 80 THEN '2S'
+							WHEN $scoreGet BETWEEN 60 AND 70 THEN '3B'
+							WHEN $scoreGet BETWEEN 50 AND 60 THEN '4M'
 						ELSE a.reward END),a.lastupdate=a.lastupdate WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P')");
 						if ($success) {
 							successState();
