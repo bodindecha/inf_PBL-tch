@@ -142,14 +142,14 @@
 						errorMessage(3, "You don't have permission to view this data");
 						slog("PBL", "load", "reward", "", "fail", "", "Unauthorized");
 					} else {
-						$scoreSrc = "FROM PBL_score b WHERE b.code=a.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' GROUP BY b.code";
-						$get = $db -> query("SELECT a.code,a.grade,a.room,a.type,(SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 $scoreSrc) AS score,a.reward,(CASE
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 80 AND 100 THEN '1G'
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 70 AND 80 THEN '2S'
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 60 AND 70 THEN '3B'
-							WHEN (SELECT SUM(b.total)/COUNT(b.cmte) $scoreSrc) BETWEEN 50 AND 60 THEN '4M'
-							WHEN a.reward IN ('1G', '2S', '3B', '4M') THEN '0P' ELSE a.reward
-						END) AS new_reward FROM PBL_group a WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P') ORDER BY a.grade,a.room,a.code");
+						$scoreSrc = "(SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 FROM PBL_score b WHERE b.code=a.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' GROUP BY b.code)";
+						$get = $db -> query("SELECT a.code,a.grade,a.room,a.type,$scoreSrc AS score,a.reward,(CASE
+							WHEN $scoreSrc BETWEEN 80 AND 100 THEN '1G'
+							WHEN $scoreSrc BETWEEN 70 AND 80 THEN '2S'
+							WHEN $scoreSrc BETWEEN 60 AND 70 THEN '3B'
+							WHEN $scoreSrc BETWEEN 50 AND 60 THEN '4M'
+							WHEN a.reward IN ('1G', '2S', '3B', '4M') THEN '0P'
+						ELSE a.reward END) AS new_reward FROM PBL_group a WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P', '6W') ORDER BY a.grade,a.room,a.code");
 						if (!$get) {
 							errorMessage(3, "There's an error generating preview");
 							slog("PBL", "load", "reward", "", "fail", "", "InvalidQuery");
@@ -198,13 +198,14 @@
 						errorMessage(2, "Token mismatched. Please try again");
 						slog("PBL", "edit", "reward", "", "fail", "", "InvalidToken");
 					} else {
-						$scoreGet = "(SELECT ROUND(SUM(b.total)/COUNT(b.cmte)) FROM PBL_score b WHERE b.code=a.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' GROUP BY b.code)";
+						$scoreGet = "(SELECT ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 FROM PBL_score b WHERE b.code=a.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' GROUP BY b.code)";
 						$success = $db -> query("UPDATE PBL_group a SET a.lastupdate=a.lastupdate,a.reward=(CASE
 							WHEN $scoreGet BETWEEN 80 AND 100 THEN '1G'
 							WHEN $scoreGet BETWEEN 70 AND 80 THEN '2S'
 							WHEN $scoreGet BETWEEN 60 AND 70 THEN '3B'
 							WHEN $scoreGet BETWEEN 50 AND 60 THEN '4M'
-						ELSE a.reward END),a.lastupdate=a.lastupdate WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P')");
+							WHEN a.reward IN ('1G', '2S', '3B', '4M') THEN '0P'
+						ELSE a.reward END) WHERE a.year=$year AND a.reward IS NOT NULL AND NOT a.reward IN('5N', '6P', '6W')");
 						if ($success) {
 							successState();
 							slog("PBL", "edit", "reward", "", "pass");

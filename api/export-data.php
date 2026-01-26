@@ -8,7 +8,6 @@
 	require_once($dirPWroot."resource/php/core/config.php");
 	require($dirPWroot."resource/php/core/db_connect.php");
 	$yearEst = 2514;
-	$elitist = [42629, /*42585, 42985,*/ 42880, /*44927,*/ 42566, 43540, 43541];
 	function reward_code2text($code) {
 		switch ($code) {
 			case "1G": $text = "ทอง"; break;
@@ -18,12 +17,14 @@
 			case "5N": $text = "เข้าร่วม"; break;
 			case "0P": $text = "ผ่านเกณฑ์"; break;
 			case "6P": $text = "คัดลอก"; break;
-			default: $text = "-"; break;
+			case "6W": $text = "ไม่ถูกต้อง"; break;
+			default: $text = "—"; break;
 		} return $text;
 	}
-	$reqType = "csv"; $delimeter = ($reqType == "tsv" ? "\t" : ",");
-	$dltime = date("Y-m-d H_i_s", time());
-	$outputData = array();
+	$reqType = "csv";
+	$delimeter = ($reqType == "tsv" ? "\t" : ",");
+	$dltime = date("Y-m-d H_i_s");
+	$outputData = [];
 	if (!has_perm("PBL") && $ds <> "branches") $errorMsg = array(2, "You don't have permission to download this dataset.");
 	else switch ($ds) {
 		case "branches": {
@@ -87,7 +88,7 @@
 		} break;
 		case "std-submission": {
 			$name = "การส่งเล่มรายงาน";
-			$result = $db -> query("SELECT b.grade,a.room,a.stdid,a.namep,a.namefth,a.namelth,a.number,a.remark,COALESCE(b.code, '') AS code,(CASE b.fileStatus&512 WHEN 512 THEN 'ส่งเล่มรายงาน' ELSE 'ไม่ส่ง' END) AS submit FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year WHERE a.gen BETWEEN 51 AND 56 AND a.room<=19 AND a.number<=90 ORDER BY a.gen DESC,a.room,b.code,(CASE b.mbr1 WHEN a.stdid THEN 1 ELSE 2 END),a.number");
+			$result = $db -> query("SELECT b.grade,a.room,a.stdid,a.namep,a.namefth,a.namelth,a.number,a.remark,COALESCE(b.code, '') AS code,(CASE b.fileStatus&512 WHEN 512 THEN 'ส่งเล่มรายงาน' ELSE 'ไม่ส่ง' END) AS submit FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 ORDER BY a.gen DESC,a.room,b.code,(CASE b.mbr1 WHEN a.stdid THEN 1 ELSE 2 END),a.number");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["ระดับชั้น", "ห้อง", "รหัสนร.", "คำนำ", "ชื่อจริง", "นามสกุล", "เลขที่", "หมายเหตุ", "รหัสโครงงาน", "การส่งเล่มรายงาน"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
@@ -97,31 +98,24 @@
 		} break;
 		case "student-score": {
 			$name = "คะแนนนักเรียนแยกส่วน";
-			$result = $db -> query("SELECT a.stdid,6-CAST(a.gen AS INT)-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,b.reward,(CASE WHEN b.reward IS NULL THEN 0 WHEN b.reward='5N' OR ROUND(SUM(c.total)/COUNT(c.cmte)) IS NULL THEN 2 WHEN ROUND(SUM(c.total)/COUNT(c.cmte))<50 THEN 2 ELSE 3 END) AS score_paper,COALESCE(b.score_poster, 0) AS score_poster,COALESCE(d.score, 0) AS score_ophact,COALESCE(b.code, '') AS code FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year LEFT JOIN PBL_score c ON c.code=b.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=c.cmte)='Y' LEFT JOIN user_score d ON d.stdid=a.stdid AND d.year=$year AND d.subj='PBL' AND d.field='oph-act' WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 GROUP BY a.stdid ORDER BY grade,a.room,a.number");
+			$result = $db -> query("SELECT a.stdid,6-CAST(a.gen AS INT)-$yearEst+$year AS grade,a.room,a.number,a.namep,CONCAT(a.namefth, '  ', a.namelth) AS nameth,a.remark,b.reward,(CASE WHEN b.reward IS NULL OR b.reward IN ('6P', '6W') THEN 0 WHEN b.reward='5N' OR SUM(c.total)/COUNT(c.cmte) IS NULL THEN 2 WHEN ROUND(SUM(c.total)*100/COUNT(c.cmte))/100<50 THEN 2 ELSE 3 END) AS score_paper,(CASE WHEN b.reward='6P' THEN 0 ELSE COALESCE(b.score_poster, 0) END) AS score_poster,(CASE WHEN b.reward='6P' THEN 0 ELSE COALESCE(d.score, 0) END) AS score_ophact,COALESCE(b.code, '') AS code FROM user_s a LEFT JOIN PBL_group b ON a.stdid IN(b.mbr1, b.mbr2, b.mbr3, b.mbr4, b.mbr5, b.mbr6, b.mbr7) AND b.year=$year LEFT JOIN PBL_score c ON c.code=b.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=c.cmte)='Y' LEFT JOIN user_score d ON d.stdid=a.stdid AND b.year=d.year AND d.subj='PBL' AND d.field='oph-act' WHERE a.gen BETWEEN $year-$yearEst AND $year-$yearEst+5 AND a.room<=19 AND a.number<=90 GROUP BY a.stdid ORDER BY grade,a.room,a.number");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["รหัสนร.", "ระดับชั้น", "ห้อง", "เลขที่", "ชื่อ-สกุล", "หมายเหตุ", "คะแนน: เล่มรายงาน", "คะแนน: โปสเตอร์", "คะแนน: เข้าร่วมกิจกรรม", "คะแนนรวม", "รหัสโครงงาน"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
 				// Modify
-				if ($er["reward"] == "6P") { // Plagiarized
-					$er["score_paper"] = 0;
-					$er["score_poster"] = 0;
-					$er["score_ophact"] = 0;
-				} $totalScore = (int)$er["score_paper"] + (int)$er["score_poster"] + (int)$er["score_ophact"];
+				$totalScore = (int)$er["score_paper"] + (int)$er["score_poster"] + (int)$er["score_ophact"];
 				// Concat
 				array_push($outputData, [$er["stdid"], $er["grade"], $er["room"], $er["number"], prefixcode2text($er["namep"])["th"].$er["nameth"], $er["remark"], $er["score_paper"], $er["score_poster"], $er["score_ophact"], $totalScore, $er["code"]]);
 			}
 		} break;
 		case "cmte-progress": {
 			$name = "ความคืบหน้าคะแนนเล่มรายงาน";
-			$result = $db -> query("SELECT c.subj,a.tchr,CONCAT('ครู', c.namefth, '  ', c.namelth) AS nameth,(CASE c.namenth WHEN '' THEN '' ELSE CONCAT('ครู', c.namenth) END) AS namen,(SELECT COUNT(e.code) FROM PBL_group e WHERE a.cmteid IN(e.mrker1, e.mrker2, e.mrker3, e.mrker4, e.mrker5) AND e.year=$year) AS assigned,COALESCE((SELECT GROUP_CONCAT(e.code) FROM PBL_group e WHERE a.cmteid IN(e.mrker1, e.mrker2, e.mrker3, e.mrker4, e.mrker5) AND e.year=$year), '') AS asgn_proj,(SELECT COUNT(b.code) FROM PBL_score b INNER JOIN PBL_group d ON b.code=d.code WHERE a.cmteid=b.cmte AND d.year=$year) AS marked,COALESCE((SELECT GROUP_CONCAT(b.code) FROM PBL_score b INNER JOIN PBL_group d ON b.code=d.code WHERE a.cmteid=b.cmte AND d.year=$year), '') AS projects FROM PBL_cmte a INNER JOIN user_t c ON a.tchr=c.namecode GROUP BY a.tchr ORDER BY c.subj,nameth");
+			$result = $db -> query("SELECT a.type,a.tchr,CONCAT('ครู', b.namefth, '  ', b.namelth) AS nameath,(CASE b.namenth WHEN '' THEN '' ELSE CONCAT('ครู', b.namenth) END) AS namenth,COUNT(DISTINCT c.code) AS assigned,GROUP_CONCAT(DISTINCT c.code ORDER BY c.code SEPARATOR ', ') AS asgn_proj,COUNT(DISTINCT d.code) AS marked,GROUP_CONCAT(DISTINCT d.code ORDER BY d.code SEPARATOR ', ') AS projects FROM PBL_cmte a INNER JOIN user_t b ON a.tchr=b.namecode LEFT JOIN PBL_group c ON a.year=c.year AND a.cmteid IN (c.mrker1, c.mrker2, c.mrker3, c.mrker4, c.mrker5) LEFT JOIN PBL_score d ON a.cmteid=d.cmte WHERE a.year=$year AND a.allow='Y' GROUP BY a.cmteid ORDER BY a.type,b.namefth,b.namelth");
 			$has_result = ($result && $result->num_rows);
-			array_push($outputData, ["กลุ่มสาระ/วิชา", "ชื่อ-สกุล", "ชื่อเล่น", "มอบหมาย", "โครงงานที่ได้รับ", "ตรวจไปแล้ว", "โครงงานที่ตรวจ"]);
+			array_push($outputData, ["สาขาโครงงาน", "ชื่อ-สกุล", "ชื่อเล่น", "มอบหมาย", "โครงงานที่ได้รับ", "ตรวจไปแล้ว", "โครงงานที่ตรวจ"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
-				// Modify
-				$er["asgn_proj"] = str_replace(",", ", ", $er["asgn_proj"]);
-				$er["projects"] = str_replace(",", ", ", $er["projects"]);
 				// Concat
-				array_push($outputData, [subjcode2name($er["subj"])["th"], $er["nameth"], $er["namen"], $er["assigned"], $er["asgn_proj"], $er["marked"], $er["projects"]]);
+				array_push($outputData, [pblcode2text($er["type"])["th"], $er["nameath"], $er["namenth"], $er["assigned"], $er["asgn_proj"], $er["marked"], $er["projects"]]);
 			}
 		} break;
 		case "cmte-score": {
@@ -138,24 +132,22 @@
 		} break;
 		case "project-score": {
 			$name = "คะแนนเฉลี่ยกรรมการ";
-			$result = $db -> query("SELECT a.type,a.grade,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS proj_name,ROUND(SUM(b.total)/COUNT(b.cmte)) AS total,(CASE WHEN SUM(b.total)/COUNT(b.cmte)<50 THEN 2 ELSE 3 END) AS score, COUNT(b.cmte) AS cmte_amt,GROUP_CONCAT(CONCAT('ครู', d.namefth, ' ', d.namelth)) AS cmte_list FROM PBL_group a INNER JOIN PBL_score b ON a.code=b.code INNER JOIN PBL_cmte c ON b.cmte=c.cmteid AND a.type=c.type AND c.year=$year INNER JOIN user_t d ON c.tchr=d.namecode WHERE a.year=$year AND c.allow='Y' GROUP BY a.code ORDER BY type,grade,code");
+			$result = $db -> query("SELECT a.type,a.grade,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS proj_name,ROUND(SUM(b.total)*100/COUNT(b.cmte))/100 AS total,(CASE WHEN ROUND(SUM(b.total)*100/COUNT(b.cmte))/100<50 THEN 2 ELSE 3 END) AS score, COUNT(b.cmte) AS cmte_amt,GROUP_CONCAT(CONCAT('ครู', d.namefth, '  ', d.namelth) SEPARATOR ', ') AS cmte_list FROM PBL_group a INNER JOIN PBL_score b ON a.code=b.code INNER JOIN PBL_cmte c ON b.cmte=c.cmteid AND a.type=c.type AND a.year=c.year INNER JOIN user_t d ON c.tchr=d.namecode WHERE a.year=$year AND c.allow='Y' AND NOT a.reward IN ('5N', '6P', '6W') GROUP BY a.code ORDER BY type,grade,code");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["สาขาโครงงาน", "ระดับชั้น", "รหัสโครงงาน", "หัวข้อโครงงาน", "คะแนนเฉลี่ย", "คิดเป็น", "จำนวนกรรมการ", "รายชื่อกรรมการ"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
-				// Modify
-				$er["cmte_list"] = str_replace(",", ", ", $er["cmte_list"]);
 				// Concat
 				array_push($outputData, [pblcode2text($er["type"])["th"], $er["grade"], $er["code"], $er["proj_name"], $er["total"], $er["score"], $er["cmte_amt"], $er["cmte_list"]]);
 			}
 		} break;
 		case "project-result": {
 			$name = "ผลและคะแนนเล่มรายงาน";
-			$result = $db -> query("SELECT a.grade,a.room,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.type,(CASE WHEN a.reward='5N' THEN 'ไม่ผ่าน' WHEN a.reward='6P' THEN 'คัดลอก' WHEN a.reward IS NULL THEN '-' ELSE 'ผ่าน' END) AS evalG,COALESCE(ROUND(SUM(b.total)/COUNT(b.cmte)*100)/100, '') AS evalM,(CASE WHEN a.reward IS NULL OR a.reward='6P' THEN 0 WHEN a.reward='5N' THEN 2 WHEN SUM(b.total)/COUNT(b.cmte) IS NULL THEN '' WHEN SUM(b.total)/COUNT(b.cmte)<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON a.code=b.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' WHERE a.year=$year AND a.mbr1 IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.room,a.code");
+			$result = $db -> query("SELECT a.grade,a.room,a.code,(CASE a.nameth WHEN '' THEN a.nameen ELSE a.nameth END) AS name,a.type,(CASE WHEN a.reward='5N' THEN 'ไม่ผ่าน' WHEN a.reward='6P' THEN 'คัดลอก' WHEN a.reward IS NULL OR a.reward='6W' THEN '—' ELSE 'ผ่าน' END) AS evalG,COALESCE(ROUND(SUM(b.total)*100/COUNT(b.cmte))/100, '') AS evalM,(CASE WHEN a.reward IS NULL OR a.reward IN ('6P', '6W') THEN 0 WHEN a.reward='5N' THEN 2 WHEN SUM(b.total)/COUNT(b.cmte) IS NULL THEN '' WHEN ROUND(SUM(b.total)*100/COUNT(b.cmte))/100<50 THEN 2 ELSE 3 END) AS score FROM PBL_group a LEFT JOIN PBL_score b ON a.code=b.code AND (SELECT allow FROM PBL_cmte WHERE cmteid=b.cmte)='Y' WHERE a.year=$year AND a.mbr1 IS NOT NULL GROUP BY a.code ORDER BY a.grade,a.room,a.code");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["ระดับชั้น", "ห้อง", "รหัสโครงงาน", "หัวข้อโครงงาน", "สาขาโครงงาน", "ผลประเมิน", "คะแนนเฉลี่ย", "คิดเป็น"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
 				// Concat
-				array_push($outputData, [$er["grade"], $er["room"], $er["code"], $er["name"], pblcode2text($er["type"])["th"], $er["evalG"], substr($er["evalM"], 0, min(strlen($er["evalM"]), 5)), $er["score"]]);
+				array_push($outputData, [$er["grade"], $er["room"], $er["code"], $er["name"], pblcode2text($er["type"])["th"], $er["evalG"], $er["evalM"], $er["score"]]);
 			}
 		} break;
 		case "present-list": {
@@ -181,17 +173,13 @@
 				if ($er["namep"] == "ด.ช.") $er["namep"] = "เด็กชาย";
 				else if ($er["namep"] == "ด.ญ.") $er["namep"] = "เด็กหญิง";
 				else if ($er["namep"] == "น.ส.") $er["namep"] = "นางสาว";
-				if (in_array($er["stdid"], $elitist)) {
-					$er["reward"] = "1G";
-					$er["code"] = "BYNI84";
-				} // Concat
-				if ($er["grade"] == 5 && $er["room"] == 19) continue;
+				// Concat
 				array_push($outputData, [$er["stdid"], $er["grade"], $er["room"], $er["number"], $er["namep"].$er["nameth"], $er["remark"], reward_code2text($er["reward"]), $er["code"], pblcode2text($er["type"])["th"]]);
 			}
 		} break;
 		case "cert-teacher": {
 			$name = "เกียรติบัตรครู";
-			$result = $db -> query("(SELECT a.grade,a.room,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS nameth,b.subj,MIN(CASE c.reward WHEN '0P' THEN '5X' WHEN '5N' THEN '6Y' WHEN NULL THEN '7Z' ELSE c.reward END) AS reward,1 AS roi FROM dat_homeroom a INNER JOIN user_t b ON a.tchr1=b.namecode LEFT JOIN PBL_group c ON (b.namecode IN(c.adv1,c.adv2,c.adv3) OR (a.grade=c.grade AND a.room=c.room)) AND c.year=$year WHERE a.year=$year AND a.sem=2 GROUP BY b.namecode) UNION (SELECT a.grade,a.room,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS nameth,b.subj,MIN(CASE c.reward WHEN '0P' THEN '5X' WHEN '5N' THEN '6Y' WHEN NULL THEN '7Z' ELSE c.reward END) AS reward,2 AS roi FROM dat_homeroom a INNER JOIN user_t b ON a.tchr2=b.namecode LEFT JOIN PBL_group c ON (b.namecode IN(c.adv1,c.adv2,c.adv3) OR (a.grade=c.grade AND a.room=c.room)) AND c.year=$year WHERE a.year=$year AND a.sem=2 GROUP BY b.namecode) ORDER BY grade,room,roi");
+			$result = $db -> query("(SELECT a.grade,a.room,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS nameth,b.subj,MIN(CASE c.reward WHEN '0P' THEN '5_' WHEN '5N' THEN '6_' WHEN NULL THEN '7_' WHEN '6P' THEN '8_' WHEN '6W' THEN '8_' ELSE c.reward END) AS reward,1 AS roi FROM dat_homeroom a INNER JOIN user_t b ON a.tchr1=b.namecode LEFT JOIN PBL_group c ON (b.namecode IN(c.adv1,c.adv2,c.adv3) OR (a.grade=c.grade AND a.room=c.room)) AND a.year=c.year WHERE a.year=$year AND a.sem=2 GROUP BY b.namecode) UNION (SELECT a.grade,a.room,b.namep,CONCAT(b.namefth, '  ', b.namelth) AS nameth,b.subj,MIN(CASE c.reward WHEN '0P' THEN '5X' WHEN '5N' THEN '6Y' WHEN NULL THEN '7Z' ELSE c.reward END) AS reward,2 AS roi FROM dat_homeroom a INNER JOIN user_t b ON a.tchr2=b.namecode LEFT JOIN PBL_group c ON (b.namecode IN(c.adv1,c.adv2,c.adv3) OR (a.grade=c.grade AND a.room=c.room)) AND a.year=c.year WHERE a.year=$year AND a.sem=2 GROUP BY b.namecode) ORDER BY grade,room,roi");
 			$has_result = ($result && $result->num_rows);
 			array_push($outputData, ["ระดับชั้น", "ห้อง", "คำนำ", "ชื่อ-สกุล", "กลุ่มสาระ/วิชา", "ระดับรางวัล"]);
 			if ($has_result) while ($er = $result->fetch_assoc()) {
