@@ -290,7 +290,7 @@ const PBL = (function(d) {
 				}
 			});
 		else {
-			$("main .results > li[open] .extender").animate({height: 0}, 500).parent().removeAttr("open");
+			// $("main .results > li[open] .extender").animate({height: 0}, 500).parent().removeAttr("open");
 			me.attr("open", "");
 			infobox.animate({height: infobox.children().first().outerHeight() + infobox.children().last().outerHeight()}, 500, $.bez([0.65, 0, 0.35, 1]));
 		}
